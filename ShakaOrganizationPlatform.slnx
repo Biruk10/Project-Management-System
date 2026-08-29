@@ -1,0 +1,6 @@
+<Solution>
+  <Project Path="ShakaOrganizationPlatform.Api/ShakaOrganizationPlatform.Api.csproj" />
+  <Project Path="ShakaOrganizationPlatform.Application/ShakaOrganizationPlatform.Application.csproj" />
+  <Project Path="ShakaOrganizationPlatform.Domain/ShakaOrganizationPlatform.Domain.csproj" />
+  <Project Path="ShakaOrganizationPlatform.Infrastructure/ShakaOrganizationPlatform.Infrastructure.csproj" />
+</Solution>

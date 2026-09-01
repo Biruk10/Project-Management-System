@@ -8,9 +8,7 @@ public class AppDbContextFactory : IDesignTimeDbContextFactory<AppDbContext>
     public AppDbContext CreateDbContext(string[] args)
     {
         var optionsBuilder = new DbContextOptionsBuilder<AppDbContext>();
-        
-        // ለ Design-time (Migration) ጊዜ የሚያገለግል የ connection string
-        optionsBuilder.UseNpgsql("Host=localhost;Database=ShakaOrgDb;Username=postgres;Password=psql");
+        optionsBuilder.UseNpgsql("Host=localhost;Database=ShakaOrgDb;Username=postgres;Password=root");
 
         return new AppDbContext(optionsBuilder.Options);
     }

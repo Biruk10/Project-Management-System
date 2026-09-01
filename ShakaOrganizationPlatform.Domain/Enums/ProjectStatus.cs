@@ -1,4 +1,4 @@
-namespace ShakaOrganizationPlatform.Domain.Common;
+namespace ShakaOrganizationPlatform.Domain.Enums;
 
 public enum ProjectStatus
 {

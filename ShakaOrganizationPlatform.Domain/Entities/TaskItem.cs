@@ -1,3 +1,5 @@
+using ShakaOrganizationPlatform.Domain.Common;
+using ShakaOrganizationPlatform.Domain.Enums;
 using TaskStatus = ShakaOrganizationPlatform.Domain.Enums.TaskStatus;
 
 namespace ShakaOrganizationPlatform.Domain.Entities;
@@ -14,6 +16,7 @@ public class TaskItem : AuditableEntity
     public decimal CompletionPercentage { get; set; } = 0;
 
     // Navigation Properties
+    public Organization Organization { get; set; } = null!;
     public Project Project { get; set; } = null!;
     public User? AssignedToUser { get; set; }
 }

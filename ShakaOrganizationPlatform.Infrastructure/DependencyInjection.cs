@@ -1,7 +1,9 @@
 using Microsoft.EntityFrameworkCore;
 using Microsoft.Extensions.Configuration;
 using Microsoft.Extensions.DependencyInjection;
+using ShakaOrganizationPlatform.Application.Auth.Services;
 using ShakaOrganizationPlatform.Application.Common.Interfaces;
+using ShakaOrganizationPlatform.Infrastructure.Authentication;
 using ShakaOrganizationPlatform.Infrastructure.Persistence;
 using ShakaOrganizationPlatform.Infrastructure.Services;
 
@@ -11,8 +13,8 @@ public static class DependencyInjection
 {
     public static IServiceCollection AddInfrastructureServices(this IServiceCollection services, IConfiguration configuration)
     {
-        var connectionString = configuration.GetConnectionString("DefaultConnection") 
-            ?? "Host=localhost;Database=ProjectManagementDb;Username=postgres;Password=psql";
+        var connectionString = configuration.GetConnectionString("DefaultConnection")
+            ?? "Host=localhost;Database=ShakaOrgDb;Username=postgres;Password=root";
 
         services.AddDbContext<AppDbContext>(options =>
         {
@@ -23,7 +25,10 @@ public static class DependencyInjection
         services.AddScoped<ITenantService, TenantService>();
         services.AddScoped<ICurrentUserService, CurrentUserService>();
 
+        services.AddScoped<IPasswordHasherService, PasswordHasherService>();
+        services.AddScoped<IJwtTokenGenerator, JwtTokenGenerator>();
+        services.AddScoped<IAuthService, AuthService>();
+
         return services;
     }
 }
-

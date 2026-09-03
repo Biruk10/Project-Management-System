@@ -18,6 +18,11 @@ var app = builder.Build();
 if (app.Environment.IsDevelopment())
 {
     app.MapOpenApi();
+    app.UseSwaggerUI(c =>
+    {
+        c.SwaggerEndpoint("/openapi/v1.json", "Project Management Platform API V1");
+        c.RoutePrefix = "swagger";
+    });
 }
 
 app.UseHttpsRedirection();

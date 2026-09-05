@@ -1,0 +1,143 @@
+.navbar {
+  height: 58px;
+  background: #fff;
+  border-bottom: 1px solid var(--gray-200);
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  padding: 0 24px;
+  flex-shrink: 0;
+  position: sticky;
+  top: 0;
+  z-index: 40;
+}
+
+.navbar-right { display: flex; align-items: center; gap: 8px; }
+
+.org-badge {
+  display: flex; align-items: center; gap: 6px;
+  font-size: 12px; font-weight: 600; color: var(--gray-500);
+  background: var(--gray-100); padding: 5px 10px; border-radius: 20px;
+}
+.org-dot {
+  width: 6px; height: 6px; border-radius: 50%;
+  background: var(--success);
+}
+
+.icon-btn {
+  position: relative;
+  width: 36px; height: 36px;
+  background: var(--gray-100);
+  border: none; border-radius: 10px;
+  cursor: pointer; display: flex; align-items: center; justify-content: center;
+  font-size: 16px;
+  transition: var(--transition);
+  &:hover { background: var(--gray-200); }
+}
+
+.notif-badge {
+  position: absolute; top: -4px; right: -4px;
+  background: var(--danger); color: #fff;
+  border-radius: 99px; min-width: 18px; height: 18px;
+  font-size: 10px; font-weight: 700;
+  display: flex; align-items: center; justify-content: center;
+  border: 2px solid #fff;
+  padding: 0 3px;
+}
+
+.notif-wrapper, .user-menu-wrapper { position: relative; }
+
+.dropdown {
+  position: absolute; top: calc(100% + 8px); right: 0;
+  background: #fff;
+  border: 1px solid var(--gray-200);
+  border-radius: var(--border-radius);
+  box-shadow: var(--card-shadow-lg);
+  z-index: 100;
+  animation: fadeIn 0.15s ease;
+  min-width: 280px;
+}
+
+.dropdown-header {
+  padding: 14px 16px 10px;
+  font-size: 13px; font-weight: 700; color: var(--gray-800);
+  border-bottom: 1px solid var(--gray-100);
+  display: flex; align-items: center; justify-content: space-between;
+}
+
+.mark-all-btn {
+  background: none; border: none; cursor: pointer;
+  font-size: 11px; color: var(--primary); font-weight: 600;
+  &:hover { text-decoration: underline; }
+}
+
+.dropdown-body { padding: 6px; }
+
+.notif-item {
+  display: flex; align-items: center; gap: 10px;
+  padding: 10px 10px; border-radius: 8px; cursor: pointer;
+  transition: background 0.12s;
+  &:hover { background: var(--gray-50); }
+  &.unread { background: rgba(99,102,241,0.04); }
+}
+
+.notif-dot-small {
+  width: 6px; height: 6px; border-radius: 50%;
+  background: var(--primary); flex-shrink: 0; opacity: 0;
+  &.show { opacity: 1; }
+}
+
+.notif-content { flex: 1; overflow: hidden; }
+.notif-title-sm { font-size: 12px; font-weight: 500; color: var(--gray-800); white-space: nowrap; overflow: hidden; text-overflow: ellipsis; }
+.notif-time { font-size: 11px; color: var(--gray-400); margin-top: 1px; }
+.notif-empty { padding: 20px; text-align: center; font-size: 13px; color: var(--gray-400); }
+
+.dropdown-footer {
+  display: block; padding: 10px 16px;
+  font-size: 12px; color: var(--primary); font-weight: 600;
+  border-top: 1px solid var(--gray-100);
+  text-align: center;
+  &:hover { background: var(--gray-50); }
+}
+
+.user-trigger {
+  display: flex; align-items: center; gap: 8px;
+  background: none; border: none; cursor: pointer;
+  padding: 5px 10px 5px 5px;
+  border-radius: 10px; transition: background 0.12s;
+  &:hover { background: var(--gray-100); }
+}
+
+.nav-avatar {
+  width: 32px; height: 32px; border-radius: 99px;
+  background: linear-gradient(135deg, #6366f1, #8b5cf6);
+  color: #fff; font-size: 12px; font-weight: 700;
+  display: flex; align-items: center; justify-content: center;
+  flex-shrink: 0;
+  &.large { width: 42px; height: 42px; font-size: 15px; border-radius: 12px; }
+}
+
+.nav-name { font-size: 13px; font-weight: 600; color: var(--gray-800); }
+.chevron { font-size: 11px; color: var(--gray-400); transition: transform 0.2s; &.open { transform: rotate(180deg); } }
+
+.user-dropdown { min-width: 240px; }
+
+.dropdown-user-header {
+  display: flex; align-items: center; gap: 12px;
+  padding: 14px 14px 12px;
+  border-bottom: 1px solid var(--gray-100);
+}
+.duh-name { font-size: 13px; font-weight: 700; color: var(--gray-900); }
+.duh-email { font-size: 11px; color: var(--gray-500); margin-top: 1px; }
+
+.dropdown-item {
+  display: flex; align-items: center; gap: 10px;
+  width: 100%; padding: 9px 10px;
+  border-radius: 8px; font-size: 13px; font-weight: 500;
+  color: var(--gray-700); background: none; border: none; cursor: pointer;
+  text-align: left; transition: background 0.12s; text-decoration: none;
+  &:hover { background: var(--gray-100); color: var(--gray-900); }
+  &.danger { color: var(--danger); &:hover { background: var(--danger-light); } }
+}
+
+.dropdown-divider { height: 1px; background: var(--gray-100); margin: 2px 0; }

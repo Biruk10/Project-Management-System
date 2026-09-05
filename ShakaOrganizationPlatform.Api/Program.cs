@@ -27,6 +27,7 @@ using (var scope = app.Services.CreateScope())
 }
 
 app.UseMiddleware<ExceptionHandlingMiddleware>();
+app.UseCors(CorsExtensions.AngularPolicy);
 
 if (app.Environment.IsDevelopment())
 {
@@ -36,6 +37,10 @@ if (app.Environment.IsDevelopment())
         c.SwaggerEndpoint("/swagger/v1/swagger.json", "OrganizationPlatform API V1");
         c.RoutePrefix = "swagger";
     });
+}
+else
+{
+    app.UseHttpsRedirection();
 }
 
 app.UseHttpsRedirection();

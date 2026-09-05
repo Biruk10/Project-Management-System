@@ -1,0 +1,75 @@
+<div class="page">
+  <div class="page-header">
+    <h1 class="page-title">Tasks</h1>
+  </div>
+
+  <div class="filters">
+    <input type="text" [(ngModel)]="search" (input)="onSearch()" placeholder="Search tasks..." class="search-input" />
+    <select [(ngModel)]="statusFilter" (change)="onSearch()" class="filter-select">
+      <option value="">All Status</option>
+      <option value="Todo">Todo</option>
+      <option value="InProgress">In Progress</option>
+      <option value="InReview">In Review</option>
+      <option value="Completed">Completed</option>
+    </select>
+    <select [(ngModel)]="priorityFilter" (change)="onSearch()" class="filter-select">
+      <option value="">All Priority</option>
+      <option value="Low">Low</option>
+      <option value="Medium">Medium</option>
+      <option value="High">High</option>
+      <option value="Critical">Critical</option>
+    </select>
+  </div>
+
+  @if (loading()) {
+    <div class="loading">Loading tasks...</div>
+  } @else {
+    <div class="table-card">
+      <table class="data-table">
+        <thead>
+          <tr>
+            <th>Title</th>
+            <th>Project</th>
+            <th>Assigned To</th>
+            <th>Priority</th>
+            <th>Status</th>
+            <th>Due Date</th>
+            <th>Progress</th>
+          </tr>
+        </thead>
+        <tbody>
+          @for (task of result()?.items; track task.id) {
+            <tr>
+              <td class="task-title">{{ task.title }}</td>
+              <td>{{ task.projectName }}</td>
+              <td>{{ task.assignedToUserName ?? '—' }}</td>
+              <td>
+                <span class="priority-badge" [class]="'priority-' + task.priority.toLowerCase()">
+                  {{ task.priority }}
+                </span>
+              </td>
+              <td>
+                <span class="badge" [class]="'badge-' + task.status.toLowerCase()">{{ task.status }}</span>
+              </td>
+              <td [class.overdue]="isOverdue(task)">
+                {{ task.dueDate ? (task.dueDate | date:'mediumDate') : '—' }}
+              </td>
+              <td>
+                <div class="mini-progress">
+                  <div class="mini-bar" [style.width.%]="task.completionPercentage"></div>
+                </div>
+                {{ task.completionPercentage }}%
+              </td>
+            </tr>
+          }
+        </tbody>
+      </table>
+    </div>
+
+    <div class="pagination">
+      <button [disabled]="page === 1" (click)="changePage(page - 1)">Previous</button>
+      <span>Page {{ page }} of {{ result()?.totalPages }}</span>
+      <button [disabled]="!result()?.hasNextPage" (click)="changePage(page + 1)">Next</button>
+    </div>
+  }
+</div>

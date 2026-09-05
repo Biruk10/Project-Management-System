@@ -1,0 +1,52 @@
+<div class="page">
+  <div class="page-header">
+    <h1 class="page-title">Finance & Budget</h1>
+  </div>
+
+  <div class="tab-bar">
+    <button [class.active]="tab === 'expenses'" (click)="tab = 'expenses'">Expenses</button>
+    <button [class.active]="tab === 'budgets'" (click)="tab = 'budgets'">Budgets</button>
+  </div>
+
+  @if (tab === 'expenses') {
+    @if (loading()) {
+      <div class="loading">Loading expenses...</div>
+    } @else {
+      <div class="table-card">
+        <table class="data-table">
+          <thead>
+            <tr>
+              <th>Project</th>
+              <th>Budget Line</th>
+              <th>Amount</th>
+              <th>Description</th>
+              <th>Date</th>
+              <th>Recorded By</th>
+            </tr>
+          </thead>
+          <tbody>
+            @for (e of expenses()?.items; track e.id) {
+              <tr>
+                <td>{{ e.projectName }}</td>
+                <td>{{ e.budgetLineCategory ?? '—' }}</td>
+                <td class="amount">{{ e.amount | number:'1.2-2' }}</td>
+                <td>{{ e.description }}</td>
+                <td>{{ e.expenseDate | date:'mediumDate' }}</td>
+                <td>{{ e.recordedByUserName ?? '—' }}</td>
+              </tr>
+            }
+            @if (!expenses()?.items?.length) {
+              <tr>
+                <td colspan="6" class="empty-cell">No expenses recorded.</td>
+              </tr>
+            }
+          </tbody>
+        </table>
+      </div>
+    }
+  }
+
+  @if (tab === 'budgets') {
+    <div class="empty-state">Select a project from the Projects page to view its budget details.</div>
+  }
+</div>

@@ -1,0 +1,28 @@
+<div class="page">
+  <div class="page-header">
+    <h1 class="page-title">Roles & Permissions</h1>
+    <button class="btn-primary">+ New Role</button>
+  </div>
+
+  <div class="roles-grid">
+    @for (role of roles(); track role.id) {
+      <div class="role-card">
+        <div class="role-header">
+          <h3 class="role-name">{{ role.name }}</h3>
+          @if (role.isSystemRole) {
+            <span class="system-badge">System</span>
+          }
+        </div>
+        <p class="role-desc">{{ role.description ?? 'No description.' }}</p>
+        <div class="permissions">
+          @for (p of role.permissions; track p) {
+            <span class="perm-tag">{{ p }}</span>
+          }
+          @if (role.permissions.length === 0) {
+            <span class="no-perms">No permissions assigned</span>
+          }
+        </div>
+      </div>
+    }
+  </div>
+</div>

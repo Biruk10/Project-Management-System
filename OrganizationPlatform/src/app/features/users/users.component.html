@@ -1,0 +1,58 @@
+﻿<div class="page">
+  <div class="page-header">
+    <h1 class="page-title">Users</h1>
+    <button class="btn-primary">+ Add User</button>
+  </div>
+
+  <div class="filters">
+    <input type="text" [(ngModel)]="search" (input)="onSearch()" placeholder="Search users..." class="search-input" />
+    <select [(ngModel)]="activeFilter" (change)="onSearch()" class="filter-select">
+      <option value="">All</option>
+      <option value="true">Active</option>
+      <option value="false">Inactive</option>
+    </select>
+  </div>
+
+  <div class="table-card">
+    <table class="data-table">
+      <thead>
+        <tr>
+          <th>Name</th>
+          <th>Email</th>
+          <th>Roles</th>
+          <th>Status</th>
+          <th>Last Login</th>
+          <th>Actions</th>
+        </tr>
+      </thead>
+      <tbody>
+        @for (user of result()?.items; track user.id) {
+          <tr>
+            <td class="user-name">
+              <div class="avatar">{{ user.firstName[0] }}</div>
+              {{ user.firstName }} {{ user.lastName }}
+            </td>
+            <td>{{ user.email }}</td>
+            <td>{{ user.roles.join(', ') || '—' }}</td>
+            <td>
+              <span class="status-dot" [class.active]="user.isActive"></span>
+              {{ user.isActive ? 'Active' : 'Inactive' }}
+            </td>
+            <td>{{ user.lastLoginAt ? (user.lastLoginAt | date:'mediumDate') : 'Never' }}</td>
+            <td>
+              <button class="btn-sm" (click)="toggle(user)">
+                {{ user.isActive ? 'Deactivate' : 'Activate' }}
+              </button>
+            </td>
+          </tr>
+        }
+      </tbody>
+    </table>
+  </div>
+
+  <div class="pagination">
+    <button [disabled]="page === 1" (click)="changePage(page - 1)">Previous</button>
+    <span>Page {{ page }} of {{ result()?.totalPages }}</span>
+    <button [disabled]="!result()?.hasNextPage" (click)="changePage(page + 1)">Next</button>
+  </div>
+</div>

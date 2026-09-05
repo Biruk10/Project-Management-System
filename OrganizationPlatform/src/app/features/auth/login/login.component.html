@@ -1,0 +1,56 @@
+<div class="auth-shell">
+  <div class="auth-left">
+    <div class="auth-brand">
+      <div class="auth-logo">⬡</div>
+      <span class="auth-logo-name">OrgPlatform</span>
+    </div>
+    <div class="auth-hero">
+      <h2>Manage your organization with clarity</h2>
+      <p>Projects, tasks, budgets and teams — all in one place.</p>
+      <div class="auth-features">
+        <div class="feat">✦ Multi-tenant isolation</div>
+        <div class="feat">✦ Role-based access control</div>
+        <div class="feat">✦ Real-time dashboards</div>
+      </div>
+    </div>
+  </div>
+
+  <div class="auth-right">
+    <div class="auth-card">
+      <div class="auth-card-header">
+        <h1>Welcome back</h1>
+        <p>Sign in to your organization</p>
+      </div>
+
+      @if (error()) {
+        <div class="alert alert-error">⚠ {{ error() }}</div>
+      }
+
+      <form [formGroup]="form" (ngSubmit)="onSubmit()" class="auth-form">
+        <div class="field">
+          <label for="email">Email address</label>
+          <input id="email" type="email" formControlName="email"
+            placeholder="you@company.com" autocomplete="email" />
+        </div>
+
+        <div class="field">
+          <label for="password">Password</label>
+          <input id="password" type="password" formControlName="password"
+            placeholder="••••••••" autocomplete="current-password" />
+        </div>
+
+        <button type="submit" class="btn-primary submit-btn" [disabled]="loading() || form.invalid">
+          @if (loading()) {
+            <span class="btn-spinner"></span> Signing in...
+          } @else {
+            Sign in →
+          }
+        </button>
+      </form>
+
+      <p class="auth-footer-text">
+        New organization? <a routerLink="/auth/register">Register here</a>
+      </p>
+    </div>
+  </div>
+</div>

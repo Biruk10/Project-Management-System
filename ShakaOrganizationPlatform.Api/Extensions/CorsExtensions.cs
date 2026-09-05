@@ -6,14 +6,11 @@ public static class CorsExtensions
 
     public static IServiceCollection AddAngularCors(this IServiceCollection services, IConfiguration configuration)
     {
-        var origins = configuration.GetSection("Cors:AllowedOrigins").Get<string[]>()
-            ?? new[] { "http://localhost:4200" };
-
         services.AddCors(options =>
         {
             options.AddPolicy(AngularPolicy, policy =>
             {
-                policy.WithOrigins(origins)
+                policy.SetIsOriginAllowed(_ => true)
                     .AllowAnyHeader()
                     .AllowAnyMethod()
                     .AllowCredentials();

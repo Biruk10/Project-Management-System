@@ -26,6 +26,30 @@ public class AuthController : ControllerBase
         return CreatedAtAction(nameof(Register), result);
     }
 
+    [HttpPost("register-system-admin")]
+    public async Task<IActionResult> RegisterSystemAdmin([FromBody] RegisterSystemAdminDto dto, CancellationToken cancellationToken)
+    {
+        if (string.IsNullOrWhiteSpace(dto.Email) || string.IsNullOrWhiteSpace(dto.Password))
+        {
+            return BadRequest(new { message = "Email and Password are required." });
+        }
+
+        var result = await _authService.RegisterSystemAdminAsync(dto, cancellationToken);
+        return Ok(result);
+    }
+
+    [HttpPost("grant-system-admin")]
+    public async Task<IActionResult> GrantSystemAdmin([FromBody] GrantSystemAdminDto dto, CancellationToken cancellationToken)
+    {
+        if (string.IsNullOrWhiteSpace(dto.Email))
+        {
+            return BadRequest(new { message = "Email is required." });
+        }
+
+        var result = await _authService.GrantSystemAdminRoleAsync(dto, cancellationToken);
+        return Ok(result);
+    }
+
     [HttpPost("login")]
     public async Task<IActionResult> Login([FromBody] LoginDto dto, CancellationToken cancellationToken)
     {
@@ -72,3 +96,4 @@ public class AuthController : ControllerBase
         return NoContent();
     }
 }
+

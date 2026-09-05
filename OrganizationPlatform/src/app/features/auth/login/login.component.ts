@@ -1,4 +1,4 @@
-import { Component, signal } from '@angular/core';
+﻿import { Component, signal } from '@angular/core';
 import { FormBuilder, FormGroup, Validators, ReactiveFormsModule } from '@angular/forms';
 import { Router, RouterLink } from '@angular/router';
 import { CommonModule } from '@angular/common';
@@ -15,12 +15,17 @@ export class LoginComponent {
   form: FormGroup;
   loading = signal(false);
   error = signal<string | null>(null);
+  showPassword = signal(false);
 
   constructor(private fb: FormBuilder, private authService: AuthService, private router: Router) {
     this.form = this.fb.group({
       email: ['', [Validators.required, Validators.email]],
       password: ['', Validators.required]
     });
+  }
+
+  togglePassword(): void {
+    this.showPassword.update(v => !v);
   }
 
   onSubmit(): void {
@@ -34,7 +39,7 @@ export class LoginComponent {
         this.router.navigate([isSystemAdmin ? '/admin' : '/dashboard']);
       },
       error: (err) => {
-        this.error.set(err.error?.error ?? 'Invalid credentials. Please try again.');
+        this.error.set(err.error?.error ?? 'Invalid email or password. Please try again.');
         this.loading.set(false);
       }
     });

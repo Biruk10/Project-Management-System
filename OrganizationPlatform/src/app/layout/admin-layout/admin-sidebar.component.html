@@ -1,0 +1,39 @@
+<aside class="sidebar">
+  <div class="sidebar-header">
+    <div class="brand">
+      <span class="brand-hex">⬡</span>
+      <div class="brand-text">
+        <span class="brand-name">OrgPlatform</span>
+        <span class="brand-role">System Control</span>
+      </div>
+    </div>
+  </div>
+
+  <nav class="nav-body">
+    <div class="nav-group-label">Overview</div>
+    <a routerLink="/admin/dashboard"     routerLinkActive="active" class="nav-item">
+      <span class="nav-icon">📊</span><span class="nav-label">Dashboard</span>
+    </a>
+    <a routerLink="/admin/organizations" routerLinkActive="active" class="nav-item">
+      <span class="nav-icon">🏢</span><span class="nav-label">Organizations</span>
+    </a>
+
+    <div class="nav-group-label">System</div>
+    <a routerLink="/admin/users"       routerLinkActive="active" class="nav-item">
+      <span class="nav-icon">👥</span><span class="nav-label">All Users</span>
+    </a>
+    <a routerLink="/admin/permissions" routerLinkActive="active" class="nav-item">
+      <span class="nav-icon">🔑</span><span class="nav-label">Permissions</span>
+    </a>
+    <a routerLink="/admin/audit"       routerLinkActive="active" class="nav-item">
+      <span class="nav-icon">📋</span><span class="nav-label">Audit Logs</span>
+    </a>
+  </nav>
+
+  <div class="sidebar-footer">
+    <button class="logout-btn" (click)="authService.logout()">
+      <span>⎋</span>
+      <span>Sign out</span>
+    </button>
+  </div>
+</aside>

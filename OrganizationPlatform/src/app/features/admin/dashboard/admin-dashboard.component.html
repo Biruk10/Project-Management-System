@@ -1,0 +1,136 @@
+<div class="page">
+  <div class="page-header">
+    <div>
+      <h1 class="page-title">Platform Dashboard</h1>
+      <p class="page-sub">System-wide overview — all organisations</p>
+    </div>
+    <span class="updated-chip">Updated {{ now | date:'h:mm a' }}</span>
+  </div>
+
+  @if (loading()) {
+    <div class="loading"><div class="spinner"></div><span>Loading platform data…</span></div>
+  }
+
+  @if (!loading() && data()) {
+    <div class="kpi-row">
+      <div class="kpi" style="--accent:#6366f1;--bg:#eef2ff">
+        <div class="kpi-icon">🏢</div>
+        <div class="kpi-value">{{ data().totalOrganizations }}</div>
+        <div class="kpi-label">Organizations</div>
+        <div class="kpi-sub">
+          <span class="dot green"></span>{{ data().activeOrganizations }} active
+          <span class="dot red"></span>{{ data().suspendedOrganizations }} suspended
+        </div>
+      </div>
+      <div class="kpi" style="--accent:#3b82f6;--bg:#dbeafe">
+        <div class="kpi-icon">👥</div>
+        <div class="kpi-value">{{ data().totalUsers }}</div>
+        <div class="kpi-label">Platform Users</div>
+        <div class="kpi-sub">across all organisations</div>
+      </div>
+      <div class="kpi" style="--accent:#10b981;--bg:#d1fae5">
+        <div class="kpi-icon">📁</div>
+        <div class="kpi-value">{{ data().totalProjects }}</div>
+        <div class="kpi-label">Total Projects</div>
+        <div class="kpi-sub">platform-wide</div>
+      </div>
+      <div class="kpi" style="--accent:#f59e0b;--bg:#fef3c7">
+        <div class="kpi-icon">✅</div>
+        <div class="kpi-value">{{ data().totalTasks }}</div>
+        <div class="kpi-label">Total Tasks</div>
+        <div class="kpi-sub">across all projects</div>
+      </div>
+      <div class="kpi" style="--accent:#14b8a6;--bg:#ccfbf1">
+        <div class="kpi-icon">💰</div>
+        <div class="kpi-value">${{ data().totalExpenses | number:'1.0-0' }}</div>
+        <div class="kpi-label">Total Expenses</div>
+        <div class="kpi-sub">of ${{ data().totalBudget | number:'1.0-0' }} budgeted</div>
+      </div>
+    </div>
+
+    <div class="dash-grid">
+      <div class="dash-card">
+        <div class="dash-card-head">
+          <span class="card-title">🏢 Recent Organisations</span>
+          <a routerLink="/admin/organizations" class="view-all">View all →</a>
+        </div>
+        <div class="org-list">
+          @for (org of data().recentOrganizations; track org.id) {
+            <div class="org-row">
+              <div class="org-av">{{ org.name[0].toUpperCase() }}</div>
+              <div class="org-info">
+                <span class="org-name">{{ org.name }}</span>
+                <span class="org-email">{{ org.email }}</span>
+              </div>
+              <span class="status-pill" [class.active]="org.isActive" [class.suspended]="!org.isActive">
+                {{ org.isActive ? 'Active' : 'Suspended' }}
+              </span>
+            </div>
+          }
+          @empty {
+            <div class="list-empty">No organisations registered yet.</div>
+          }
+        </div>
+      </div>
+
+      <div class="dash-card">
+        <div class="dash-card-head">
+          <span class="card-title">⚡ Recent Platform Activity</span>
+          <a routerLink="/admin/audit" class="view-all">View all →</a>
+        </div>
+        <div class="activity-list">
+          @for (a of data().recentActivity; track $index) {
+            <div class="activity-row">
+              <div class="activity-dot"></div>
+              <div class="activity-info">
+                <span class="activity-action"><strong>{{ a.action }}</strong> {{ a.entityName }}</span>
+                <span class="activity-meta">{{ a.orgName }} · {{ a.occurredAt | date:'MMM d, h:mm a' }}</span>
+              </div>
+            </div>
+          }
+          @empty {
+            <div class="list-empty">No recent activity.</div>
+          }
+        </div>
+      </div>
+
+      <div class="dash-card">
+        <div class="dash-card-head">
+          <span class="card-title">📊 Budget Utilisation</span>
+        </div>
+        <div class="budget-meters">
+          @for (org of data().recentOrganizations; track org.id) {
+            <div class="bm-row">
+              <span class="bm-label" [title]="org.name">{{ org.name }}</span>
+              <div class="bm-track">
+                <div class="bm-fill"
+                  [style.width.%]="utilizationPct(org)"
+                  [class.warn]="utilizationPct(org) > 75"
+                  [class.danger]="utilizationPct(org) > 90">
+                </div>
+              </div>
+              <span class="bm-pct">{{ utilizationPct(org) }}%</span>
+            </div>
+          }
+          @empty {
+            <div class="list-empty">No data yet.</div>
+          }
+        </div>
+      </div>
+
+      <div class="dash-card">
+        <div class="dash-card-head">
+          <span class="card-title">⚙️ System Status</span>
+        </div>
+        <div class="status-list">
+          <div class="status-row"><span class="status-label">API Service</span><span class="pill green">● Operational</span></div>
+          <div class="status-row"><span class="status-label">Database</span><span class="pill green">● Connected</span></div>
+          <div class="status-row"><span class="status-label">JWT Auth</span><span class="pill green">● Running</span></div>
+          <div class="status-row"><span class="status-label">Tenant Isolation</span><span class="pill green">● Enforced</span></div>
+          <div class="status-row"><span class="status-label">Permission RBAC</span><span class="pill green">● Active</span></div>
+          <div class="status-row"><span class="status-label">Platform Scope</span><span class="pill purple">● Separate</span></div>
+        </div>
+      </div>
+    </div>
+  }
+</div>

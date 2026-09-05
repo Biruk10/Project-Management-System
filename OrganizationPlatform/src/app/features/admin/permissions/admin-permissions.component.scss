@@ -1,0 +1,64 @@
+@use '../../../layout/platform-layout/platform-theme' as t;
+
+.page { color: t.$text-primary; }
+.page-header { display: flex; align-items: flex-start; justify-content: space-between; margin-bottom: 20px; }
+.page-title  { font-size: 22px; font-weight: 800; color: t.$text-primary; margin-bottom: 4px; }
+.page-sub    { font-size: 13px; color: t.$text-muted; }
+.count-chip  { background: t.$purple-light; color: t.$purple; border: 1px solid t.$purple-mid; padding: 6px 14px; border-radius: 20px; font-size: 12px; font-weight: 700; }
+
+.legend-row  { display: flex; gap: 12px; flex-wrap: wrap; margin-bottom: 20px; }
+.legend-item {
+  font-size: 12px; font-weight: 600; padding: 5px 14px; border-radius: 20px;
+  &.platform { background: t.$purple-light; color: t.$purple; border: 1px solid t.$purple-mid; }
+  &.tenant   { background: t.$bg-surface;   color: t.$text-secondary; border: 1px solid t.$border; }
+}
+
+.loading { display: flex; align-items: center; justify-content: center; padding: 60px; }
+.spinner  { width: 26px; height: 26px; border: 3px solid t.$border; border-top-color: t.$purple; border-radius: 50%; animation: admin-spin 0.7s linear infinite; }
+@keyframes admin-spin { to { transform: rotate(360deg); } }
+
+.modules-grid { display: grid; grid-template-columns: repeat(auto-fill, minmax(340px, 1fr)); gap: 14px; }
+
+.mod-card {
+  @include t.card;
+  padding: 0;
+
+  &.is-platform {
+    border-color: t.$purple-mid;
+    box-shadow: 0 0 0 1px t.$purple-mid, t.$shadow-sm;
+  }
+}
+
+.mod-head {
+  display: flex;
+  align-items: center;
+  gap: 8px;
+  padding: 14px 16px 12px;
+  background: t.$bg-surface;
+  border-bottom: 1px solid t.$border;
+}
+
+.mod-icon  { font-size: 16px; }
+.mod-name  { font-size: 13px; font-weight: 700; color: t.$text-primary; flex: 1; }
+.mod-count {
+  font-size: 11px; font-weight: 700; padding: 2px 8px; border-radius: 10px;
+  background: t.$purple-light; color: t.$purple;
+}
+
+.platform-label {
+  font-size: 10px; font-weight: 700; padding: 2px 8px; border-radius: 10px;
+  background: t.$purple; color: #fff; text-transform: uppercase; letter-spacing: 0.04em;
+}
+.tenant-label {
+  font-size: 10px; font-weight: 700; padding: 2px 8px; border-radius: 10px;
+  background: t.$border; color: t.$text-muted; text-transform: uppercase; letter-spacing: 0.04em;
+}
+
+.perm-list { padding: 6px; }
+.perm-row {
+  display: flex; align-items: center; gap: 10px;
+  padding: 8px 10px; border-radius: 6px; transition: t.$transition;
+  &:hover { background: t.$bg-surface; }
+}
+.perm-key  { font-family: 'Courier New', monospace; font-size: 11px; font-weight: 700; color: t.$purple; min-width: 185px; flex-shrink: 0; }
+.perm-desc { font-size: 12px; color: t.$text-muted; }

@@ -19,24 +19,18 @@ public class TenantService : ITenantService
         get
         {
             if (_explicitTenantId.HasValue)
-            {
                 return _explicitTenantId.Value;
-            }
 
             var user = _httpContextAccessor.HttpContext?.User;
-            if (user != null)
-            {
-                var orgClaim = user.FindFirst("OrganizationId")?.Value
-                    ?? user.FindFirst("organization_id")?.Value
-                    ?? user.FindFirst("tenant_id")?.Value;
+            if (user == null) return null;
 
-                if (int.TryParse(orgClaim, out var orgId))
-                {
-                    return orgId;
-                }
-            }
+            if (IsSystemAdmin(user)) return null;
 
-            return null;
+            var orgClaim = user.FindFirst("OrganizationId")?.Value
+                ?? user.FindFirst("organization_id")?.Value
+                ?? user.FindFirst("tenant_id")?.Value;
+
+            return int.TryParse(orgClaim, out var orgId) ? orgId : null;
         }
     }
 
@@ -46,5 +40,10 @@ public class TenantService : ITenantService
     {
         _explicitTenantId = organizationId;
     }
-}
 
+    private static bool IsSystemAdmin(ClaimsPrincipal user)
+    {
+        return user.FindFirst("IsSystemAdmin")?.Value == "true"
+            || user.IsInRole("SystemAdmin");
+    }
+}

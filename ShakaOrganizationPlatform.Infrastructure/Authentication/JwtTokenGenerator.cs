@@ -44,6 +44,8 @@ public class JwtTokenGenerator : IJwtTokenGenerator
         foreach (var role in roles)
         {
             claims.Add(new Claim(ClaimTypes.Role, role));
+            if (role == "SystemAdmin")
+                claims.Add(new Claim("IsSystemAdmin", "true"));
         }
 
         var tokenDescriptor = new SecurityTokenDescriptor

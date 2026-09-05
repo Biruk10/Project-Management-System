@@ -1,0 +1,41 @@
+@use './_admin-theme' as a;
+
+.admin-shell {
+  display: flex;
+  height: 100vh;
+  overflow: hidden;
+  background: a.$bg-deepest;
+}
+
+.admin-body {
+  flex: 1;
+  display: flex;
+  flex-direction: column;
+  overflow: hidden;
+  min-width: 0;
+  background: a.$bg-shell;
+}
+
+.admin-main {
+  flex: 1;
+  overflow-y: auto;
+  overflow-x: hidden;
+
+  &::-webkit-scrollbar {
+    width: 5px;
+  }
+  &::-webkit-scrollbar-track {
+    background: a.$bg-shell;
+  }
+  &::-webkit-scrollbar-thumb {
+    background: a.$border;
+    border-radius: 99px;
+  }
+}
+
+.admin-content {
+  padding: 28px 36px;
+  max-width: 1440px;
+  margin: 0 auto;
+  animation: a.admin-fade-in 0.25s ease forwards;
+}

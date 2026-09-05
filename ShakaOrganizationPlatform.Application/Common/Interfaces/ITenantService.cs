@@ -6,4 +6,3 @@ public interface ITenantService
     bool HasTenant { get; }
     void SetTenant(int organizationId);
 }
-

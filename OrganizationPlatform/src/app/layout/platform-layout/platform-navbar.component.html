@@ -1,0 +1,19 @@
+<header class="navbar">
+  <div class="navbar-left">
+    <div class="platform-badge">
+      <span class="pulse-dot"></span>
+      Platform Administration
+    </div>
+  </div>
+
+  <div class="navbar-right">
+    <span class="clock">{{ now | date:'EEE, MMM d · h:mm a' }}</span>
+    <div class="user-chip">
+      <div class="user-avatar">{{ initials() }}</div>
+      <div class="user-info">
+        <span class="user-name">{{ authService.currentUser()?.firstName }} {{ authService.currentUser()?.lastName }}</span>
+        <span class="user-role">System Administrator</span>
+      </div>
+    </div>
+  </div>
+</header>

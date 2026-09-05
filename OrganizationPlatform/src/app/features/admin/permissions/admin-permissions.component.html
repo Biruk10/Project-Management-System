@@ -1,0 +1,43 @@
+<div class="page">
+  <div class="page-header">
+    <div>
+      <h1 class="page-title">Permission Matrix</h1>
+      <p class="page-sub">Platform-scoped and tenant-scoped permissions — clearly separated</p>
+    </div>
+    <span class="count-chip">{{ total() }} permissions</span>
+  </div>
+
+  <div class="legend-row">
+    <span class="legend-item platform">🛡️ Platform permissions — SystemAdmin only</span>
+    <span class="legend-item tenant">🏢 Tenant permissions — organisation roles</span>
+  </div>
+
+  @if (loading()) {
+    <div class="loading"><div class="spinner"></div></div>
+  } @else {
+    <div class="modules-grid">
+      @for (mod of modules(); track mod.name) {
+        <div class="mod-card" [class.is-platform]="mod.isPlatform">
+          <div class="mod-head">
+            <span class="mod-icon">{{ mod.icon }}</span>
+            <span class="mod-name">{{ mod.name }}</span>
+            <span class="mod-count">{{ mod.permissions.length }}</span>
+            @if (mod.isPlatform) {
+              <span class="platform-label">Platform-scoped</span>
+            } @else {
+              <span class="tenant-label">Tenant-scoped</span>
+            }
+          </div>
+          <div class="perm-list">
+            @for (p of mod.permissions; track p.id) {
+              <div class="perm-row">
+                <span class="perm-key">{{ p.key }}</span>
+                <span class="perm-desc">{{ p.description }}</span>
+              </div>
+            }
+          </div>
+        </div>
+      }
+    </div>
+  }
+</div>

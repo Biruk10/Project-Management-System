@@ -1,0 +1,79 @@
+<div class="page">
+  <div class="page-header">
+    <div>
+      <h1 class="page-title">Platform Users</h1>
+      <p class="page-sub">All users registered across all organizations</p>
+    </div>
+    <span class="count-chip">{{ total() }} users</span>
+  </div>
+
+  <div class="filters">
+    <input class="search-inp" [(ngModel)]="search" (ngModelChange)="applyFilter()" placeholder="🔍  Search by name, email or organization…" />
+  </div>
+
+  @if (loading()) {
+    <div class="loading"><div class="spinner"></div><span>Loading users…</span></div>
+  } @else {
+    <div class="table-card">
+      <table class="tbl">
+        <thead>
+          <tr>
+            <th>User</th>
+            <th>Organization</th>
+            <th>Roles</th>
+            <th>Status</th>
+            <th>Last Login</th>
+            <th>Joined</th>
+            <th>Actions</th>
+          </tr>
+        </thead>
+        <tbody>
+          @for (u of filtered(); track u.id) {
+            <tr>
+              <td>
+                <div class="user-cell">
+                  <div class="user-av">{{ u.firstName[0] }}{{ u.lastName[0] }}</div>
+                  <div>
+                    <div class="user-name">{{ u.firstName }} {{ u.lastName }}</div>
+                    <div class="user-email">{{ u.email }}</div>
+                  </div>
+                </div>
+              </td>
+              <td class="org-td">{{ u.organizationName }}</td>
+              <td>
+                <div class="role-chips">
+                  @for (r of (u.roles ?? []); track r) {
+                    <span class="role-chip" [class.admin]="r === 'OrganizationAdmin'" [class.pm]="r === 'ProjectManager'">
+                      {{ r }}
+                    </span>
+                  }
+                </div>
+              </td>
+              <td>
+                <span class="status-pill" [class.active]="u.isActive" [class.inactive]="!u.isActive">
+                  ● {{ u.isActive ? 'Active' : 'Inactive' }}
+                </span>
+              </td>
+              <td class="date">{{ u.lastLoginAt ? (u.lastLoginAt | date:'MMM d, y') : 'Never' }}</td>
+              <td class="date">{{ u.createdAt | date:'MMM d, y' }}</td>
+              <td>
+                @if (u.isActive) {
+                  <button class="btn-action danger" (click)="deactivate(u.id)" [disabled]="actionId() === u.id">
+                    {{ actionId() === u.id ? '…' : 'Deactivate' }}
+                  </button>
+                } @else {
+                  <button class="btn-action success" (click)="activate(u.id)" [disabled]="actionId() === u.id">
+                    {{ actionId() === u.id ? '…' : 'Activate' }}
+                  </button>
+                }
+              </td>
+            </tr>
+          }
+          @empty {
+            <tr><td colspan="7" class="empty-cell">No users found.</td></tr>
+          }
+        </tbody>
+      </table>
+    </div>
+  }
+</div>

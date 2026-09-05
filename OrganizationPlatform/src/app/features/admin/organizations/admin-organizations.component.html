@@ -1,0 +1,80 @@
+<div class="page">
+  <div class="page-header">
+    <div>
+      <h1 class="page-title">Organizations</h1>
+      <p class="page-sub">All registered tenants on the platform</p>
+    </div>
+    <span class="count-chip">{{ filtered().length }} organizations</span>
+  </div>
+
+  <div class="filters">
+    <input class="search-inp" [(ngModel)]="search" (ngModelChange)="applyFilter()" placeholder="🔍  Search by name or email…" />
+    <select class="filter-sel" [(ngModel)]="statusFilter" (ngModelChange)="applyFilter()">
+      <option value="">All Status</option>
+      <option value="active">Active</option>
+      <option value="suspended">Suspended</option>
+    </select>
+  </div>
+
+  @if (loading()) {
+    <div class="loading"><div class="spinner"></div><span>Loading…</span></div>
+  } @else {
+    <div class="table-card">
+      <table class="tbl">
+        <thead>
+          <tr>
+            <th>Organization</th>
+            <th>Status</th>
+            <th>Users</th>
+            <th>Projects</th>
+            <th>Tasks</th>
+            <th>Budget</th>
+            <th>Expenses</th>
+            <th>Registered</th>
+            <th>Actions</th>
+          </tr>
+        </thead>
+        <tbody>
+          @for (org of filtered(); track org.id) {
+            <tr>
+              <td>
+                <div class="org-cell">
+                  <div class="org-av">{{ org.name[0].toUpperCase() }}</div>
+                  <div>
+                    <div class="org-name">{{ org.name }}</div>
+                    <div class="org-email">{{ org.email }}</div>
+                  </div>
+                </div>
+              </td>
+              <td>
+                <span class="status-pill" [class.active]="org.isActive" [class.suspended]="!org.isActive">
+                  ● {{ org.isActive ? 'Active' : 'Suspended' }}
+                </span>
+              </td>
+              <td class="num">{{ org.totalUsers }}</td>
+              <td class="num">{{ org.totalProjects }}</td>
+              <td class="num">{{ org.totalTasks }}</td>
+              <td class="money">${{ org.totalBudget   | number:'1.0-0' }}</td>
+              <td class="money">${{ org.totalExpenses | number:'1.0-0' }}</td>
+              <td class="date">{{ org.createdAt | date:'MMM d, y' }}</td>
+              <td>
+                @if (org.isActive) {
+                  <button class="btn-action danger" (click)="suspend(org.id)" [disabled]="actionId() === org.id">
+                    {{ actionId() === org.id ? '…' : 'Suspend' }}
+                  </button>
+                } @else {
+                  <button class="btn-action success" (click)="activate(org.id)" [disabled]="actionId() === org.id">
+                    {{ actionId() === org.id ? '…' : 'Activate' }}
+                  </button>
+                }
+              </td>
+            </tr>
+          }
+          @empty {
+            <tr><td colspan="9" class="empty-cell">No organizations found.</td></tr>
+          }
+        </tbody>
+      </table>
+    </div>
+  }
+</div>

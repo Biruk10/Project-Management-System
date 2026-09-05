@@ -1,81 +1,71 @@
-using Microsoft.AspNetCore.Http;
+using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Mvc;
+using Microsoft.EntityFrameworkCore;
 using ShakaOrganizationPlatform.Application.Organizations.DTOs;
 using ShakaOrganizationPlatform.Application.Organizations.Services;
+using ShakaOrganizationPlatform.Infrastructure.Persistence;
+using ShakaOrganizationPlatform.Infrastructure.Persistence.Seed;
 
 namespace ShakaOrganizationPlatform.Api.Controllers;
 
+[Authorize]
 [ApiController]
-[Route("api/[controller]")]
-[Produces("application/json")]
+[Route("api/organizations")]
 public class OrganizationsController : ControllerBase
 {
     private readonly IOrganizationService _organizationService;
+    private readonly AppDbContext _db;
 
-    public OrganizationsController(IOrganizationService organizationService)
+    public OrganizationsController(IOrganizationService organizationService, AppDbContext db)
     {
         _organizationService = organizationService;
+        _db = db;
     }
 
-    /// <summary>
-    /// Retrieves an Organization by ID
-    /// </summary>
-    [HttpGet("{id:int}")]
-    [ProducesResponseType(typeof(OrganizationDto), StatusCodes.Status200OK)]
-    [ProducesResponseType(StatusCodes.Status404NotFound)]
-    public async Task<ActionResult<OrganizationDto>> GetById(int id, CancellationToken cancellationToken)
-    {
-        var result = await _organizationService.GetByIdAsync(id, cancellationToken);
-        if (result == null)
-        {
-            return NotFound();
-        }
-
-        return Ok(result);
-    }
-
-    /// <summary>
-    /// Retrieves all Organizations
-    /// </summary>
     [HttpGet]
-    [ProducesResponseType(typeof(List<OrganizationDto>), StatusCodes.Status200OK)]
-    public async Task<ActionResult<List<OrganizationDto>>> GetAll(CancellationToken cancellationToken)
+    [Authorize(Policy = "Organization.Read")]
+    public async Task<IActionResult> GetCurrent(CancellationToken cancellationToken)
     {
-        var results = await _organizationService.GetAllAsync(cancellationToken);
-        return Ok(results);
-    }
-
-    /// <summary>
-    /// Updates an existing Organization
-    /// </summary>
-    [HttpPut("{id:int}")]
-    [ProducesResponseType(typeof(OrganizationDto), StatusCodes.Status200OK)]
-    [ProducesResponseType(StatusCodes.Status404NotFound)]
-    public async Task<ActionResult<OrganizationDto>> Update(int id, [FromBody] UpdateOrganizationDto dto, CancellationToken cancellationToken)
-    {
-        var result = await _organizationService.UpdateAsync(id, dto, cancellationToken);
-        if (result == null)
-        {
-            return NotFound();
-        }
-
+        var result = await _organizationService.GetCurrentAsync(cancellationToken);
+        if (result == null) return NotFound();
         return Ok(result);
     }
 
-    /// <summary>
-    /// Deletes an Organization
-    /// </summary>
-    [HttpDelete("{id:int}")]
-    [ProducesResponseType(StatusCodes.Status204NoContent)]
-    [ProducesResponseType(StatusCodes.Status404NotFound)]
-    public async Task<IActionResult> Delete(int id, CancellationToken cancellationToken)
+    [HttpPut]
+    [Authorize(Policy = "Organization.Update")]
+    public async Task<IActionResult> Update([FromBody] UpdateOrganizationDto dto, CancellationToken cancellationToken)
     {
-        var deleted = await _organizationService.DeleteAsync(id, cancellationToken);
-        if (!deleted)
-        {
-            return NotFound();
-        }
+        var result = await _organizationService.UpdateAsync(dto, cancellationToken);
+        return Ok(result);
+    }
 
-        return NoContent();
+    [HttpGet("all")]
+    [Authorize(Roles = "SystemAdmin")]
+    public async Task<IActionResult> GetAll(CancellationToken cancellationToken)
+    {
+        var orgs = await _db.Organizations
+            .IgnoreQueryFilters()
+            .Where(o => o.Name != SystemAdminSeeder.SystemOrgName)
+            .Select(o => new
+            {
+                o.Id,
+                o.Name,
+                o.Email,
+                o.IsActive,
+                o.CreatedAt,
+                TotalUsers = o.Users.Count,
+                TotalProjects = o.Projects.Count,
+                TotalTasks = o.Projects.SelectMany(p => p.Tasks).Count(),
+                TotalExpenses = o.Projects
+                    .SelectMany(p => p.Expenses)
+                    .Sum(e => (decimal?)e.Amount) ?? 0m,
+                TotalBudget = o.Projects
+                    .SelectMany(p => p.Budgets)
+                    .Sum(b => (decimal?)b.TotalAmount) ?? 0m
+            })
+            .OrderBy(o => o.Name)
+            .ToListAsync(cancellationToken);
+
+        return Ok(orgs);
     }
 }

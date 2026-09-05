@@ -1,0 +1,55 @@
+<div class="page">
+  <div class="page-header">
+    <div>
+      <h1 class="page-title">Audit Logs</h1>
+      <p class="page-sub">Platform-wide operation history across all organizations</p>
+    </div>
+    <span class="count-chip">{{ total() }} entries</span>
+  </div>
+
+  <div class="filters">
+    <input class="search-inp" [(ngModel)]="search" (ngModelChange)="applyFilter()" placeholder="🔍  Search by action, entity or organization…" />
+    <select class="filter-sel" [(ngModel)]="entityFilter" (ngModelChange)="applyFilter()">
+      <option value="">All Entities</option>
+      @for (e of entityNames(); track e) {
+        <option [value]="e">{{ e }}</option>
+      }
+    </select>
+  </div>
+
+  @if (loading()) {
+    <div class="loading"><div class="spinner"></div><span>Loading audit logs…</span></div>
+  } @else {
+    <div class="table-card">
+      <table class="tbl">
+        <thead>
+          <tr>
+            <th>When</th>
+            <th>Organization</th>
+            <th>User</th>
+            <th>Action</th>
+            <th>Entity</th>
+            <th>Entity ID</th>
+            <th>IP</th>
+          </tr>
+        </thead>
+        <tbody>
+          @for (log of filtered(); track log.id) {
+            <tr>
+              <td class="date">{{ log.occurredAt | date:'MMM d, y · h:mm a' }}</td>
+              <td class="org">{{ log.organizationName }}</td>
+              <td class="user">{{ log.userName ?? '—' }}</td>
+              <td><span class="action-badge" [class]="actionClass(log.action)">{{ log.action }}</span></td>
+              <td class="entity">{{ log.entityName }}</td>
+              <td class="eid">#{{ log.entityId }}</td>
+              <td class="ip">{{ log.ipAddress ?? '—' }}</td>
+            </tr>
+          }
+          @empty {
+            <tr><td colspan="7" class="empty-cell">No audit logs found.</td></tr>
+          }
+        </tbody>
+      </table>
+    </div>
+  }
+</div>

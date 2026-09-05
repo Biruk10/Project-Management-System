@@ -1,33 +1,47 @@
+using ShakaOrganizationPlatform.Api.Extensions;
+using ShakaOrganizationPlatform.Api.Middleware;
 using ShakaOrganizationPlatform.Application;
 using ShakaOrganizationPlatform.Infrastructure;
+using ShakaOrganizationPlatform.Infrastructure.Persistence;
+using ShakaOrganizationPlatform.Infrastructure.Persistence.Seed;
 
 var builder = WebApplication.CreateBuilder(args);
 
-// Add services to the container.
 builder.Services.AddHttpContextAccessor();
 builder.Services.AddControllers();
-builder.Services.AddOpenApi();
+builder.Services.AddSwaggerWithJwt();
+builder.Services.AddAngularCors(builder.Configuration);
 
-// Clean Architecture layer registrations
 builder.Services.AddApplicationServices();
 builder.Services.AddInfrastructureServices(builder.Configuration);
 
 var app = builder.Build();
 
-// Configure the HTTP request pipeline.
+using (var scope = app.Services.CreateScope())
+{
+    var db = scope.ServiceProvider.GetRequiredService<AppDbContext>();
+    await db.Database.EnsureCreatedAsync();
+    await PermissionSeeder.SeedAsync(db);
+    await SystemAdminSeeder.SeedAsync(db);
+    await RolePermissionSeeder.RepairExistingOrganizationsAsync(db);
+}
+
+app.UseMiddleware<ExceptionHandlingMiddleware>();
+
 if (app.Environment.IsDevelopment())
 {
-    app.MapOpenApi();
+    app.UseSwagger();
     app.UseSwaggerUI(c =>
     {
-        c.SwaggerEndpoint("/openapi/v1.json", "Project Management Platform API V1");
+        c.SwaggerEndpoint("/swagger/v1/swagger.json", "OrganizationPlatform API V1");
         c.RoutePrefix = "swagger";
     });
 }
 
 app.UseHttpsRedirection();
+app.UseCors(CorsExtensions.AngularPolicy);
+app.UseAuthentication();
 app.UseAuthorization();
-
 app.MapControllers();
 
 app.Run();

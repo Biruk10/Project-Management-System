@@ -2,25 +2,59 @@ namespace ShakaOrganizationPlatform.Application.Auth.DTOs;
 
 public class RegisterOrganizationDto
 {
-    // Organization Details
     public string Name { get; set; } = string.Empty;
     public string? LogoUrl { get; set; }
     public string? Address { get; set; }
     public string? Phone { get; set; }
     public string Email { get; set; } = string.Empty;
     public string TimeZone { get; set; } = "UTC";
-
-    // Administrator User Details
     public string AdminFirstName { get; set; } = string.Empty;
     public string AdminLastName { get; set; } = string.Empty;
     public string AdminEmail { get; set; } = string.Empty;
     public string AdminPassword { get; set; } = string.Empty;
 }
 
+public class RegisterSystemAdminDto
+{
+    public string FirstName { get; set; } = string.Empty;
+    public string LastName { get; set; } = string.Empty;
+    public string Email { get; set; } = string.Empty;
+    public string Password { get; set; } = string.Empty;
+    public int OrganizationId { get; set; } = 1;
+}
+
+public class GrantSystemAdminDto
+{
+    public string Email { get; set; } = string.Empty;
+}
+
 public class LoginDto
 {
     public string Email { get; set; } = string.Empty;
     public string Password { get; set; } = string.Empty;
+}
+
+public class RefreshTokenDto
+{
+    public string RefreshToken { get; set; } = string.Empty;
+}
+
+public class ChangePasswordDto
+{
+    public string CurrentPassword { get; set; } = string.Empty;
+    public string NewPassword { get; set; } = string.Empty;
+}
+
+public class ForgotPasswordDto
+{
+    public string Email { get; set; } = string.Empty;
+}
+
+public class ResetPasswordDto
+{
+    public string Email { get; set; } = string.Empty;
+    public string Token { get; set; } = string.Empty;
+    public string NewPassword { get; set; } = string.Empty;
 }
 
 public class AuthResponseDto
@@ -48,4 +82,3 @@ public class OrganizationSummaryDto
     public string Name { get; set; } = string.Empty;
     public string Email { get; set; } = string.Empty;
 }
-

@@ -1,0 +1,38 @@
+@use 'platform-theme' as t;
+
+.shell {
+  display: flex;
+  height: 100vh;
+  overflow: hidden;
+  background: t.$bg-page;
+}
+
+.shell-body {
+  flex: 1;
+  display: flex;
+  flex-direction: column;
+  overflow: hidden;
+  min-width: 0;
+}
+
+.shell-main {
+  flex: 1;
+  overflow-y: auto;
+  overflow-x: hidden;
+
+  &::-webkit-scrollbar       { width: 5px; }
+  &::-webkit-scrollbar-track { background: t.$bg-page; }
+  &::-webkit-scrollbar-thumb { background: t.$border; border-radius: 99px; }
+}
+
+.shell-content {
+  padding: 28px 36px;
+  max-width: 1440px;
+  margin: 0 auto;
+  animation: platform-fade 0.22s ease forwards;
+}
+
+@keyframes platform-fade {
+  from { opacity: 0; transform: translateY(6px); }
+  to   { opacity: 1; transform: translateY(0); }
+}

@@ -1,118 +1,89 @@
 using Microsoft.EntityFrameworkCore;
 using ShakaOrganizationPlatform.Application.Common.Interfaces;
 using ShakaOrganizationPlatform.Application.Organizations.DTOs;
-using ShakaOrganizationPlatform.Domain.Entities;
 
 namespace ShakaOrganizationPlatform.Application.Organizations.Services;
 
 public class OrganizationService : IOrganizationService
 {
     private readonly IAppDbContext _context;
+    private readonly ITenantService _tenantService;
 
-    public OrganizationService(IAppDbContext context)
+    public OrganizationService(IAppDbContext context, ITenantService tenantService)
     {
         _context = context;
+        _tenantService = tenantService;
     }
 
-    public async Task<OrganizationDto> CreateAsync(CreateOrganizationDto dto, CancellationToken cancellationToken = default)
+    public async Task<OrganizationDto?> GetCurrentAsync(CancellationToken cancellationToken = default)
     {
-        var organization = new Organization
-        {
-            Name = dto.Name,
-            LogoUrl = dto.LogoUrl,
-            Address = dto.Address,
-            Phone = dto.Phone,
-            Email = dto.Email,
-            TimeZone = string.IsNullOrWhiteSpace(dto.TimeZone) ? "UTC" : dto.TimeZone,
-            IsActive = true,
-            CreatedAt = DateTime.UtcNow
-        };
+        var orgId = _tenantService.OrganizationId;
+        if (!orgId.HasValue) return null;
 
-        _context.Organizations.Add(organization);
-        await _context.SaveChangesAsync(cancellationToken);
+        var org = await _context.Organizations
+            .FirstOrDefaultAsync(o => o.Id == orgId.Value, cancellationToken);
 
-        return MapToDto(organization);
-    }
+        if (org == null) return null;
 
-    public async Task<OrganizationDto?> GetByIdAsync(int id, CancellationToken cancellationToken = default)
-    {
-        var organization = await _context.Organizations
-            .AsNoTracking()
-            .FirstOrDefaultAsync(o => o.Id == id, cancellationToken);
-
-        return organization == null ? null : MapToDto(organization);
-    }
-
-    public async Task<List<OrganizationDto>> GetAllAsync(CancellationToken cancellationToken = default)
-    {
-        return await _context.Organizations
-            .AsNoTracking()
-            .Select(o => new OrganizationDto
-            {
-                Id = o.Id,
-                Name = o.Name,
-                LogoUrl = o.LogoUrl,
-                Address = o.Address,
-                Phone = o.Phone,
-                Email = o.Email,
-                TimeZone = o.TimeZone,
-                IsActive = o.IsActive,
-                CreatedAt = o.CreatedAt,
-                UpdatedAt = o.UpdatedAt
-            })
-            .ToListAsync(cancellationToken);
-    }
-
-    public async Task<OrganizationDto?> UpdateAsync(int id, UpdateOrganizationDto dto, CancellationToken cancellationToken = default)
-    {
-        var organization = await _context.Organizations.FirstOrDefaultAsync(o => o.Id == id, cancellationToken);
-        if (organization == null)
-        {
-            return null;
-        }
-
-        organization.Name = dto.Name;
-        organization.LogoUrl = dto.LogoUrl;
-        organization.Address = dto.Address;
-        organization.Phone = dto.Phone;
-        organization.Email = dto.Email;
-        organization.TimeZone = string.IsNullOrWhiteSpace(dto.TimeZone) ? "UTC" : dto.TimeZone;
-        organization.IsActive = dto.IsActive;
-        organization.UpdatedAt = DateTime.UtcNow;
-
-        await _context.SaveChangesAsync(cancellationToken);
-
-        return MapToDto(organization);
-    }
-
-    public async Task<bool> DeleteAsync(int id, CancellationToken cancellationToken = default)
-    {
-        var organization = await _context.Organizations.FirstOrDefaultAsync(o => o.Id == id, cancellationToken);
-        if (organization == null)
-        {
-            return false;
-        }
-
-        _context.Organizations.Remove(organization);
-        await _context.SaveChangesAsync(cancellationToken);
-        return true;
-    }
-
-    private static OrganizationDto MapToDto(Organization o)
-    {
         return new OrganizationDto
         {
-            Id = o.Id,
-            Name = o.Name,
-            LogoUrl = o.LogoUrl,
-            Address = o.Address,
-            Phone = o.Phone,
-            Email = o.Email,
-            TimeZone = o.TimeZone,
-            IsActive = o.IsActive,
-            CreatedAt = o.CreatedAt,
-            UpdatedAt = o.UpdatedAt
+            Id = org.Id,
+            Name = org.Name,
+            LogoUrl = org.LogoUrl,
+            Address = org.Address,
+            Phone = org.Phone,
+            Email = org.Email,
+            TimeZone = org.TimeZone,
+            IsActive = org.IsActive,
+            CreatedAt = org.CreatedAt
         };
     }
-}
 
+    public async Task<OrganizationDto> UpdateAsync(UpdateOrganizationDto dto, CancellationToken cancellationToken = default)
+    {
+        var orgId = _tenantService.OrganizationId
+            ?? throw new InvalidOperationException("No tenant context.");
+
+        var org = await _context.Organizations
+            .FirstOrDefaultAsync(o => o.Id == orgId, cancellationToken)
+            ?? throw new KeyNotFoundException("Organization not found.");
+
+        org.Name = dto.Name;
+        org.LogoUrl = dto.LogoUrl;
+        org.Address = dto.Address;
+        org.Phone = dto.Phone;
+        org.Email = dto.Email;
+        org.TimeZone = string.IsNullOrWhiteSpace(dto.TimeZone) ? "UTC" : dto.TimeZone;
+        org.UpdatedAt = DateTime.UtcNow;
+
+        await _context.SaveChangesAsync(cancellationToken);
+
+        return new OrganizationDto
+        {
+            Id = org.Id,
+            Name = org.Name,
+            LogoUrl = org.LogoUrl,
+            Address = org.Address,
+            Phone = org.Phone,
+            Email = org.Email,
+            TimeZone = org.TimeZone,
+            IsActive = org.IsActive,
+            CreatedAt = org.CreatedAt
+        };
+    }
+
+    public async Task DeactivateAsync(CancellationToken cancellationToken = default)
+    {
+        var orgId = _tenantService.OrganizationId
+            ?? throw new InvalidOperationException("No tenant context.");
+
+        var org = await _context.Organizations
+            .FirstOrDefaultAsync(o => o.Id == orgId, cancellationToken)
+            ?? throw new KeyNotFoundException("Organization not found.");
+
+        org.IsActive = false;
+        org.UpdatedAt = DateTime.UtcNow;
+
+        await _context.SaveChangesAsync(cancellationToken);
+    }
+}

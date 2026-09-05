@@ -1,0 +1,76 @@
+@use './_admin-theme' as a;
+
+.navbar {
+  height: 58px;
+  background: a.$bg-deepest;
+  border-bottom: 1px solid a.$border;
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  padding: 0 28px;
+  flex-shrink: 0;
+}
+
+.system-pill {
+  display: flex;
+  align-items: center;
+  gap: 8px;
+  padding: 6px 14px;
+  background: rgba(a.$purple, 0.12);
+  border: 1px solid rgba(a.$purple, 0.28);
+  color: #a5b4fc;
+  border-radius: 20px;
+  font-size: 12px;
+  font-weight: 600;
+  letter-spacing: 0.02em;
+}
+
+.pulse-dot {
+  width: 7px;
+  height: 7px;
+  border-radius: 50%;
+  background: a.$green;
+  box-shadow: 0 0 8px rgba(a.$green, 0.7);
+  animation: pulse-glow 2s ease-in-out infinite;
+}
+
+@keyframes pulse-glow {
+  0%, 100% { opacity: 1; box-shadow: 0 0 8px rgba(a.$green, 0.7); }
+  50%       { opacity: 0.5; box-shadow: 0 0 3px rgba(a.$green, 0.3); }
+}
+
+.navbar-right {
+  display: flex;
+  align-items: center;
+  gap: 20px;
+}
+
+.clock {
+  font-size: 12px;
+  color: a.$text-dimmed;
+  font-weight: 500;
+  font-variant-numeric: tabular-nums;
+}
+
+.user-chip {
+  display: flex;
+  align-items: center;
+  gap: 10px;
+  padding: 5px 12px 5px 5px;
+  background: rgba(255, 255, 255, 0.03);
+  border: 1px solid a.$border;
+  border-radius: 30px;
+}
+
+.user-avatar {
+  @include a.gradient-avatar(30px, 50%);
+  font-size: 11px;
+}
+
+.user-meta {
+  display: flex;
+  flex-direction: column;
+}
+
+.user-name  { font-size: 12px; font-weight: 700; color: a.$text-secondary; }
+.user-email { font-size: 10px; color: a.$text-dimmed; }

@@ -8,13 +8,10 @@ public class TaskItem
     public required string Description{get; set;}
     public required int AssignedUSerId{get; set;}
     public required string Priority{get; set;}
-    public required string Status {get; set;}
+    public TaskStatus Status {get; set;}
     public required string DueDate{get; set;}
     public required string ComplationPercent{get; set;}
     public DateTime CreatedAt { get; set; } = DateTime.UtcNow;
     public DateTime UpdatedAt { get; set; } = DateTime.UtcNow;
-   
-
-
 
 }

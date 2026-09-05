@@ -10,7 +10,7 @@ public class BudgetService(AppDbContext context, ILogger<BudgetService>
 logger) : IBudgetsService
 {
 
-     public Task<BudgetResponseDto?> GetByIdAsync(int id,
+     public Task<BudgetResponseDto?> GetById(int id,
         CancellationToken cn)
     {
         return context.Budgets
@@ -26,16 +26,16 @@ public async Task<BudgetResponseDto?> CreateBudgetAsync(
     {
         var budget = new Budget
         {
-            Id = Budget.Id,
             OrganizId = Budget.OrganizId,
             ProjectId = Budget.ProjectId,
             TotalAmount = Budget.TotalAmount,
+            Status = Budget.Status,
             ApprovedBy = Budget.ApprovedBy,
             ApprovedAt = Budget.ApprovedAt,
         };
         context.Budgets.Add(budget);
         await context.SaveChangesAsync(cn);
         logger.LogInformation("Created budget {BudgetId} ({TotalAmount})", budget.Id, budget.TotalAmount);
-        return (await GetByIdAsync(budget.Id, cn))!;
+        return (await GetById(budget.Id, cn))!;
     }
 }

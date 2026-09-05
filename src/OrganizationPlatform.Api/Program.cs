@@ -3,7 +3,7 @@ using Microsoft.EntityFrameworkCore;
 using organizationPlatform.Application.Interface;
 using organizationPlatform.Infrastructure.Services;
 using Scalar.AspNetCore;
-
+using System.Text.Json.Serialization;
 
 var builder = WebApplication.CreateBuilder(args);
 
@@ -16,6 +16,16 @@ options.UseNpgsql(builder.Configuration.GetConnectionString("AppDatabase"))
 
 .LogTo(Console.WriteLine, LogLevel.Information) // Log SQL to output window
 .EnableSensitiveDataLogging()); // Show parameters in querylogs (dev only)
+
+//enum converter
+builder.Services
+    .AddControllers()
+    .AddJsonOptions(options =>
+    {
+        options.JsonSerializerOptions.Converters.Add(
+            new JsonStringEnumConverter());
+    });
+    
 builder.Services.AddScoped<IBudgetsService, BudgetService>();
 
 

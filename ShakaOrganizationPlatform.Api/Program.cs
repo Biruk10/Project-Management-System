@@ -5,10 +5,16 @@ using ShakaOrganizationPlatform.Infrastructure;
 using ShakaOrganizationPlatform.Infrastructure.Persistence;
 using ShakaOrganizationPlatform.Infrastructure.Persistence.Seed;
 
+using System.Text.Json.Serialization;
+
 var builder = WebApplication.CreateBuilder(args);
 
 builder.Services.AddHttpContextAccessor();
-builder.Services.AddControllers();
+builder.Services.AddControllers()
+    .AddJsonOptions(options =>
+    {
+        options.JsonSerializerOptions.Converters.Add(new JsonStringEnumConverter());
+    });
 builder.Services.AddSwaggerWithJwt();
 builder.Services.AddAngularCors(builder.Configuration);
 
@@ -43,7 +49,6 @@ else
     app.UseHttpsRedirection();
 }
 
-app.UseHttpsRedirection();
 app.UseCors(CorsExtensions.AngularPolicy);
 app.UseAuthentication();
 app.UseAuthorization();

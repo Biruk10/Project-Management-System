@@ -71,8 +71,8 @@ public class ProjectService : IProjectService
             OrganizationId = orgId,
             Name = dto.Name,
             Description = dto.Description,
-            StartDate = dto.StartDate,
-            EndDate = dto.EndDate,
+            StartDate = EnsureUtc(dto.StartDate),
+            EndDate = EnsureUtc(dto.EndDate),
             Status = ProjectStatus.NotStarted,
             ProgressPercentage = 0,
             ProjectManagerId = dto.ProjectManagerId,
@@ -103,6 +103,35 @@ public class ProjectService : IProjectService
             }
         }
 
+        if (dto.InitialBudget.HasValue && dto.InitialBudget.Value > 0)
+        {
+            var budget = new Budget
+            {
+                OrganizationId = orgId,
+                ProjectId = project.Id,
+                TotalAmount = dto.InitialBudget.Value,
+                Status = BudgetStatus.Approved,
+                ApprovedBy = _currentUserService.UserId,
+                ApprovedAt = DateTime.UtcNow,
+                CreatedAt = DateTime.UtcNow,
+                CreatedByUserId = _currentUserService.UserId
+            };
+
+            _context.Budgets.Add(budget);
+            await _context.SaveChangesAsync(cancellationToken);
+
+            var category = string.IsNullOrWhiteSpace(dto.BudgetCategory) ? "General" : dto.BudgetCategory.Trim();
+            _context.BudgetLines.Add(new BudgetLine
+            {
+                BudgetId = budget.Id,
+                Category = category,
+                Description = "Initial project budget allocation",
+                AllocatedAmount = dto.InitialBudget.Value
+            });
+
+            await _context.SaveChangesAsync(cancellationToken);
+        }
+
         return (await GetByIdAsync(project.Id, cancellationToken))!;
     }
 
@@ -114,13 +143,32 @@ public class ProjectService : IProjectService
 
         project.Name = dto.Name;
         project.Description = dto.Description;
-        project.StartDate = dto.StartDate;
-        project.EndDate = dto.EndDate;
+        project.StartDate = EnsureUtc(dto.StartDate);
+        project.EndDate = EnsureUtc(dto.EndDate);
         project.Status = dto.Status;
         project.ProgressPercentage = dto.ProgressPercentage;
         project.ProjectManagerId = dto.ProjectManagerId;
         project.UpdatedAt = DateTime.UtcNow;
         project.UpdatedByUserId = _currentUserService.UserId;
+
+        if (dto.ProjectManagerId.HasValue)
+        {
+            var memberExists = await _context.ProjectMembers
+                .AnyAsync(pm => pm.ProjectId == project.Id && pm.UserId == dto.ProjectManagerId.Value, cancellationToken);
+
+            if (!memberExists)
+            {
+                var orgId = _tenantService.OrganizationId ?? project.OrganizationId;
+                _context.ProjectMembers.Add(new ProjectMember
+                {
+                    OrganizationId = orgId,
+                    ProjectId = project.Id,
+                    UserId = dto.ProjectManagerId.Value,
+                    ProjectRole = "ProjectManager",
+                    JoinedAt = DateTime.UtcNow
+                });
+            }
+        }
 
         await _context.SaveChangesAsync(cancellationToken);
 
@@ -206,5 +254,18 @@ public class ProjectService : IProjectService
                 JoinedAt = m.JoinedAt
             }).ToList()
         };
+    }
+
+    private static DateTime EnsureUtc(DateTime dt)
+    {
+        if (dt.Kind == DateTimeKind.Utc) return dt;
+        return DateTime.SpecifyKind(dt, DateTimeKind.Utc);
+    }
+
+    private static DateTime? EnsureUtc(DateTime? dt)
+    {
+        if (!dt.HasValue) return null;
+        if (dt.Value.Kind == DateTimeKind.Utc) return dt.Value;
+        return DateTime.SpecifyKind(dt.Value, DateTimeKind.Utc);
     }
 }

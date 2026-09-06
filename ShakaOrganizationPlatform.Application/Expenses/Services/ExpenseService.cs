@@ -34,10 +34,10 @@ public class ExpenseService : IExpenseService
             query = query.Where(e => e.BudgetLineId == filters.BudgetLineId.Value);
 
         if (filters.From.HasValue)
-            query = query.Where(e => e.ExpenseDate >= filters.From.Value);
+            query = query.Where(e => e.ExpenseDate >= EnsureUtc(filters.From.Value));
 
         if (filters.To.HasValue)
-            query = query.Where(e => e.ExpenseDate <= filters.To.Value);
+            query = query.Where(e => e.ExpenseDate <= EnsureUtc(filters.To.Value));
 
         var totalCount = await query.CountAsync(cancellationToken);
 
@@ -71,14 +71,32 @@ public class ExpenseService : IExpenseService
         if (!projectExists)
             throw new KeyNotFoundException($"Project {dto.ProjectId} not found.");
 
+        var projectBudgets = await _context.Budgets
+            .Include(b => b.BudgetLines)
+            .Where(b => b.ProjectId == dto.ProjectId)
+            .ToListAsync(cancellationToken);
+
+        if (projectBudgets.Count == 0)
+            throw new InvalidOperationException("Cannot record an expense for a project without an allocated budget. Please add a budget first.");
+
+        var targetBudgetLineId = dto.BudgetLineId;
+        if (!targetBudgetLineId.HasValue)
+        {
+            var firstLine = projectBudgets.SelectMany(b => b.BudgetLines).FirstOrDefault();
+            if (firstLine != null)
+            {
+                targetBudgetLineId = firstLine.Id;
+            }
+        }
+
         var expense = new Expense
         {
             OrganizationId = orgId,
             ProjectId = dto.ProjectId,
-            BudgetLineId = dto.BudgetLineId,
+            BudgetLineId = targetBudgetLineId,
             Amount = dto.Amount,
             Description = dto.Description,
-            ExpenseDate = dto.ExpenseDate,
+            ExpenseDate = EnsureUtc(dto.ExpenseDate),
             RecordedByUserId = _currentUserService.UserId,
             CreatedAt = DateTime.UtcNow,
             CreatedByUserId = _currentUserService.UserId
@@ -99,7 +117,7 @@ public class ExpenseService : IExpenseService
         expense.BudgetLineId = dto.BudgetLineId;
         expense.Amount = dto.Amount;
         expense.Description = dto.Description;
-        expense.ExpenseDate = dto.ExpenseDate;
+        expense.ExpenseDate = EnsureUtc(dto.ExpenseDate);
         expense.UpdatedAt = DateTime.UtcNow;
         expense.UpdatedByUserId = _currentUserService.UserId;
 
@@ -137,5 +155,18 @@ public class ExpenseService : IExpenseService
                 : null,
             CreatedAt = expense.CreatedAt
         };
+    }
+
+    private static DateTime EnsureUtc(DateTime dt)
+    {
+        if (dt.Kind == DateTimeKind.Utc) return dt;
+        return DateTime.SpecifyKind(dt, DateTimeKind.Utc);
+    }
+
+    private static DateTime? EnsureUtc(DateTime? dt)
+    {
+        if (!dt.HasValue) return null;
+        if (dt.Value.Kind == DateTimeKind.Utc) return dt.Value;
+        return DateTime.SpecifyKind(dt.Value, DateTimeKind.Utc);
     }
 }

@@ -91,7 +91,7 @@ public class TaskService : ITaskService
             AssignedToUserId = dto.AssignedToUserId,
             Priority = dto.Priority,
             Status = TaskStatus.Todo,
-            DueDate = dto.DueDate,
+            DueDate = EnsureUtc(dto.DueDate),
             CompletionPercentage = 0,
             CreatedAt = DateTime.UtcNow,
             CreatedByUserId = _currentUserService.UserId
@@ -114,7 +114,7 @@ public class TaskService : ITaskService
         task.AssignedToUserId = dto.AssignedToUserId;
         task.Priority = dto.Priority;
         task.Status = dto.Status;
-        task.DueDate = dto.DueDate;
+        task.DueDate = EnsureUtc(dto.DueDate);
         task.CompletionPercentage = dto.CompletionPercentage;
         task.UpdatedAt = DateTime.UtcNow;
         task.UpdatedByUserId = _currentUserService.UserId;
@@ -154,5 +154,12 @@ public class TaskService : ITaskService
             CompletionPercentage = task.CompletionPercentage,
             CreatedAt = task.CreatedAt
         };
+    }
+
+    private static DateTime? EnsureUtc(DateTime? dt)
+    {
+        if (!dt.HasValue) return null;
+        if (dt.Value.Kind == DateTimeKind.Utc) return dt.Value;
+        return DateTime.SpecifyKind(dt.Value, DateTimeKind.Utc);
     }
 }

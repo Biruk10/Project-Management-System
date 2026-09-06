@@ -34,6 +34,8 @@ public class CreateProjectDto
     public DateTime StartDate { get; set; }
     public DateTime? EndDate { get; set; }
     public int? ProjectManagerId { get; set; }
+    public decimal? InitialBudget { get; set; }
+    public string? BudgetCategory { get; set; }
 }
 
 public class UpdateProjectDto

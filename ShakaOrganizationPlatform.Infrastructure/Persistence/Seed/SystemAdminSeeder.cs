@@ -16,7 +16,6 @@ public static class SystemAdminSeeder
 
     public static async Task SeedAsync(AppDbContext context)
     {
-        // 1. System organisation (not a real tenant — never shown to org users)
         var systemOrg = await context.Organizations
             .IgnoreQueryFilters()
             .FirstOrDefaultAsync(o => o.Name == SystemOrgName);
@@ -32,7 +31,6 @@ public static class SystemAdminSeeder
             await context.SaveChangesAsync();
         }
 
-        // 2. SystemAdmin role — receives ONLY Platform.* permissions
         var role = await context.Roles
             .IgnoreQueryFilters()
             .FirstOrDefaultAsync(r => r.OrganizationId == systemOrg.Id && r.Name == SystemAdminRole);
@@ -50,7 +48,6 @@ public static class SystemAdminSeeder
             await context.SaveChangesAsync();
         }
 
-        // 3. SystemAdmin user — create or repair hash
         var user = await context.Users
             .IgnoreQueryFilters()
             .FirstOrDefaultAsync(u => u.Email == SystemAdminEmail);
@@ -78,8 +75,6 @@ public static class SystemAdminSeeder
         }
         else
         {
-            // Re-hash the password using the current hasher in case the stored hash
-            // was created by a different hasher (e.g. BCrypt from an older seeder version).
             var verifyResult = Hasher.VerifyHashedPassword(user, user.PasswordHash, DefaultPassword);
             if (verifyResult == PasswordVerificationResult.Failed)
             {
@@ -88,7 +83,6 @@ public static class SystemAdminSeeder
             }
         }
 
-        // 4. Assign only Platform.* permissions to SystemAdmin role
         await AssignPlatformPermissionsAsync(context, role.Id);
     }
 

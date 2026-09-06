@@ -13,7 +13,6 @@ public class Project : AuditableEntity
     public decimal ProgressPercentage { get; set; } = 0;
     public int? ProjectManagerId { get; set; }
 
-    // Navigation Properties
     public Organization Organization { get; set; } = null!;
     public User? ProjectManager { get; set; }
     public ICollection<ProjectMember> Members { get; set; } = new List<ProjectMember>();

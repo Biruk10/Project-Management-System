@@ -200,7 +200,6 @@ public class ProjectService : IProjectService
         string email = dto.Email?.Trim() ?? string.Empty;
         string? phone = dto.Phone?.Trim();
 
-        // If UserId provided, populate names from User if available
         if (dto.UserId.HasValue)
         {
             var user = await _context.Users.FirstOrDefaultAsync(u => u.Id == dto.UserId.Value, cancellationToken);
@@ -213,7 +212,6 @@ public class ProjectService : IProjectService
         }
         else if (!string.IsNullOrEmpty(email))
         {
-            // Try to match existing organization user by email
             var user = await _context.Users
                 .FirstOrDefaultAsync(u => u.Email.ToLower() == email.ToLower(), cancellationToken);
             if (user != null)
@@ -224,7 +222,6 @@ public class ProjectService : IProjectService
             }
         }
 
-        // Check if already member (by UserId or Email)
         var alreadyMember = await _context.ProjectMembers.AnyAsync(pm =>
             pm.ProjectId == projectId && (
                 (matchedUserId.HasValue && pm.UserId == matchedUserId) ||
@@ -254,7 +251,6 @@ public class ProjectService : IProjectService
 
     public async Task RemoveMemberAsync(int projectId, int memberId, CancellationToken cancellationToken = default)
     {
-        // Try match by ProjectMember.Id first, fallback to UserId
         var member = await _context.ProjectMembers
             .FirstOrDefaultAsync(pm => pm.ProjectId == projectId && (pm.Id == memberId || pm.UserId == memberId), cancellationToken)
             ?? throw new KeyNotFoundException("Project member not found.");

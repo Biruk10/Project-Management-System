@@ -1,4 +1,4 @@
-﻿using Microsoft.EntityFrameworkCore;
+using Microsoft.EntityFrameworkCore;
 using ShakaOrganizationPlatform.Application.Budgets.DTOs;
 using ShakaOrganizationPlatform.Application.Common.Interfaces;
 using ShakaOrganizationPlatform.Domain.Entities;
@@ -89,7 +89,6 @@ public class BudgetRequestService : IBudgetRequestService
         if (string.IsNullOrWhiteSpace(dto.Reason))
             throw new ArgumentException("Reason is required.");
 
-        // Determine current budget for this category if existing
         decimal currentCategoryBudget = 0;
         int? budgetLineId = dto.BudgetLineId;
 
@@ -145,13 +144,11 @@ public class BudgetRequestService : IBudgetRequestService
         {
             request.Status = BudgetRequestStatus.Approved;
 
-            // Apply requested amount to project budget
             var project = request.Project;
             var primaryBudget = project.Budgets.OrderByDescending(b => b.CreatedAt).FirstOrDefault();
 
             if (primaryBudget == null)
             {
-                // Create budget if none existed
                 primaryBudget = new Budget
                 {
                     OrganizationId = request.OrganizationId,
@@ -179,12 +176,10 @@ public class BudgetRequestService : IBudgetRequestService
             }
             else
             {
-                // Increase total amount
                 primaryBudget.TotalAmount += request.RequestedAmount;
                 primaryBudget.UpdatedAt = DateTime.UtcNow;
                 primaryBudget.UpdatedByUserId = _currentUserService.UserId;
 
-                // Find matching category line or create a new one
                 var line = request.BudgetLineId.HasValue
                     ? primaryBudget.BudgetLines.FirstOrDefault(l => l.Id == request.BudgetLineId.Value)
                     : primaryBudget.BudgetLines.FirstOrDefault(l => l.Category.Equals(request.Category, StringComparison.OrdinalIgnoreCase));

@@ -44,7 +44,6 @@ public class AppDbContext : DbContext, IAppDbContext
     {
         base.OnModelCreating(modelBuilder);
 
-        // Global UTC DateTime Converter for PostgreSQL timestamptz
         var dateTimeConverter = new ValueConverter<DateTime, DateTime>(
             v => v.Kind == DateTimeKind.Utc ? v : DateTime.SpecifyKind(v, DateTimeKind.Utc),
             v => DateTime.SpecifyKind(v, DateTimeKind.Utc));
@@ -53,7 +52,6 @@ public class AppDbContext : DbContext, IAppDbContext
             v => v.HasValue ? (v.Value.Kind == DateTimeKind.Utc ? v.Value : DateTime.SpecifyKind(v.Value, DateTimeKind.Utc)) : v,
             v => v.HasValue ? DateTime.SpecifyKind(v.Value, DateTimeKind.Utc) : v);
 
-        // Global Tenant Query Filters for all ITenantEntity entities & DateTime UTC converters
         foreach (var entityType in modelBuilder.Model.GetEntityTypes())
         {
             if (typeof(ITenantEntity).IsAssignableFrom(entityType.ClrType))
@@ -74,7 +72,6 @@ public class AppDbContext : DbContext, IAppDbContext
             }
         }
 
-        // Decimal Precision Configuration
         modelBuilder.Entity<Project>()
             .Property(p => p.ProgressPercentage)
             .HasPrecision(5, 2);
@@ -103,7 +100,6 @@ public class AppDbContext : DbContext, IAppDbContext
             .Property(br => br.RequestedAmount)
             .HasPrecision(18, 2);
 
-        // Indexes
         modelBuilder.Entity<Permission>()
             .HasIndex(p => p.Key)
             .IsUnique();
@@ -127,21 +123,18 @@ public class AppDbContext : DbContext, IAppDbContext
         modelBuilder.Entity<ProjectMember>()
             .HasIndex(pm => new { pm.ProjectId, pm.Email });
 
-        // User Relationships
         modelBuilder.Entity<User>()
             .HasOne(u => u.Organization)
             .WithMany(o => o.Users)
             .HasForeignKey(u => u.OrganizationId)
             .OnDelete(DeleteBehavior.Restrict);
 
-        // Role Relationships
         modelBuilder.Entity<Role>()
             .HasOne(r => r.Organization)
             .WithMany(o => o.Roles)
             .HasForeignKey(r => r.OrganizationId)
             .OnDelete(DeleteBehavior.Cascade);
 
-        // UserRole Relationships
         modelBuilder.Entity<UserRole>()
             .HasOne(ur => ur.User)
             .WithMany(u => u.UserRoles)
@@ -160,7 +153,6 @@ public class AppDbContext : DbContext, IAppDbContext
             .HasForeignKey(ur => ur.OrganizationId)
             .OnDelete(DeleteBehavior.Cascade);
 
-        // RolePermission Relationships
         modelBuilder.Entity<RolePermission>()
             .HasOne(rp => rp.Role)
             .WithMany(r => r.RolePermissions)
@@ -173,7 +165,6 @@ public class AppDbContext : DbContext, IAppDbContext
             .HasForeignKey(rp => rp.PermissionId)
             .OnDelete(DeleteBehavior.Cascade);
 
-        // Project Relationships
         modelBuilder.Entity<Project>()
             .HasOne(p => p.Organization)
             .WithMany(o => o.Projects)
@@ -186,7 +177,6 @@ public class AppDbContext : DbContext, IAppDbContext
             .HasForeignKey(p => p.ProjectManagerId)
             .OnDelete(DeleteBehavior.SetNull);
 
-        // ProjectMember Relationships
         modelBuilder.Entity<ProjectMember>()
             .HasOne(pm => pm.Project)
             .WithMany(p => p.Members)
@@ -206,7 +196,6 @@ public class AppDbContext : DbContext, IAppDbContext
             .HasForeignKey(pm => pm.OrganizationId)
             .OnDelete(DeleteBehavior.Cascade);
 
-        // BudgetRequest Relationships
         modelBuilder.Entity<BudgetRequest>()
             .HasOne(br => br.Project)
             .WithMany()
@@ -233,7 +222,6 @@ public class AppDbContext : DbContext, IAppDbContext
             .HasForeignKey(br => br.OrganizationId)
             .OnDelete(DeleteBehavior.Cascade);
 
-        // TaskItem Relationships
         modelBuilder.Entity<TaskItem>()
             .HasOne(t => t.Project)
             .WithMany(p => p.Tasks)
@@ -252,7 +240,6 @@ public class AppDbContext : DbContext, IAppDbContext
             .HasForeignKey(t => t.OrganizationId)
             .OnDelete(DeleteBehavior.Cascade);
 
-        // Budget Relationships
         modelBuilder.Entity<Budget>()
             .HasOne(b => b.Project)
             .WithMany(p => p.Budgets)
@@ -271,14 +258,12 @@ public class AppDbContext : DbContext, IAppDbContext
             .HasForeignKey(b => b.OrganizationId)
             .OnDelete(DeleteBehavior.Cascade);
 
-        // BudgetLine Relationships
         modelBuilder.Entity<BudgetLine>()
             .HasOne(bl => bl.Budget)
             .WithMany(b => b.BudgetLines)
             .HasForeignKey(bl => bl.BudgetId)
             .OnDelete(DeleteBehavior.Cascade);
 
-        // Expense Relationships
         modelBuilder.Entity<Expense>()
             .HasOne(e => e.Project)
             .WithMany(p => p.Expenses)
@@ -303,7 +288,6 @@ public class AppDbContext : DbContext, IAppDbContext
             .HasForeignKey(e => e.OrganizationId)
             .OnDelete(DeleteBehavior.Cascade);
 
-        // Notification Relationships
         modelBuilder.Entity<Notification>()
             .HasOne(n => n.User)
             .WithMany(u => u.Notifications)
@@ -316,7 +300,6 @@ public class AppDbContext : DbContext, IAppDbContext
             .HasForeignKey(n => n.OrganizationId)
             .OnDelete(DeleteBehavior.Cascade);
 
-        // AuditLog Relationships
         modelBuilder.Entity<AuditLog>()
             .HasOne(a => a.User)
             .WithMany(u => u.AuditLogs)

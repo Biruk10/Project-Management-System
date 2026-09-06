@@ -15,7 +15,6 @@ public class TaskItem : AuditableEntity
     public DateTime? DueDate { get; set; }
     public decimal CompletionPercentage { get; set; } = 0;
 
-    // Navigation Properties
     public Organization Organization { get; set; } = null!;
     public Project Project { get; set; } = null!;
     public User? AssignedToUser { get; set; }

@@ -9,7 +9,6 @@ public class UserRole : TenantEntity
     public DateTime AssignedAt { get; set; } = DateTime.UtcNow;
     public int? AssignedByUserId { get; set; }
 
-    // Navigation Properties
     public User User { get; set; } = null!;
     public Role Role { get; set; } = null!;
     public Organization Organization { get; set; } = null!;

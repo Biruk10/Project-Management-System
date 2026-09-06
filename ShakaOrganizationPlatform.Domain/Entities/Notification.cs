@@ -12,7 +12,6 @@ public class Notification : AuditableEntity
     public bool IsRead { get; set; } = false;
     public DateTime? ReadAt { get; set; }
 
-    // Navigation Properties
     public Organization Organization { get; set; } = null!;
     public User User { get; set; } = null!;
 }

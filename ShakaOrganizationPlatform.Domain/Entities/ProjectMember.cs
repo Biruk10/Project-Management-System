@@ -1,4 +1,4 @@
-﻿using ShakaOrganizationPlatform.Domain.Common;
+using ShakaOrganizationPlatform.Domain.Common;
 
 namespace ShakaOrganizationPlatform.Domain.Entities;
 
@@ -13,7 +13,6 @@ public class ProjectMember : TenantEntity
     public string ProjectRole { get; set; } = string.Empty;
     public DateTime JoinedAt { get; set; } = DateTime.UtcNow;
 
-    // Navigation Properties
     public Project Project { get; set; } = null!;
     public User? User { get; set; }
     public Organization Organization { get; set; } = null!;

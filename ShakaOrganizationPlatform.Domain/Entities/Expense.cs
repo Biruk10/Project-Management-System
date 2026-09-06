@@ -11,7 +11,6 @@ public class Expense : AuditableEntity
     public DateTime ExpenseDate { get; set; } = DateTime.UtcNow;
     public int? RecordedByUserId { get; set; }
 
-    // Navigation Properties
     public Organization Organization { get; set; } = null!;
     public Project Project { get; set; } = null!;
     public BudgetLine? BudgetLine { get; set; }

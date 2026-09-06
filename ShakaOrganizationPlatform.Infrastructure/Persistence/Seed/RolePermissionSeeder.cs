@@ -5,7 +5,6 @@ namespace ShakaOrganizationPlatform.Infrastructure.Persistence.Seed;
 
 public static class RolePermissionSeeder
 {
-    // OrganizationAdmin gets all tenant permissions — never Platform.*
     private static readonly string[] AdminPermissions = PermissionSeeder.TenantPermissions;
 
     private static readonly string[] ProjectManagerPermissions =

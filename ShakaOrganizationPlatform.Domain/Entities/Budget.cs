@@ -11,7 +11,6 @@ public class Budget : AuditableEntity
     public int? ApprovedBy { get; set; }
     public DateTime? ApprovedAt { get; set; }
 
-    // Navigation Properties
     public Organization Organization { get; set; } = null!;
     public Project Project { get; set; } = null!;
     public User? ApprovedByUser { get; set; }

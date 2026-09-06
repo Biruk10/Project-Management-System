@@ -15,7 +15,6 @@ public class User : AuditableEntity
     public int FailedLoginAttempts { get; set; } = 0;
     public DateTime? LockoutEnd { get; set; }
 
-    // Navigation Properties
     public Organization Organization { get; set; } = null!;
     public ICollection<UserRole> UserRoles { get; set; } = new List<UserRole>();
     public ICollection<ProjectMember> ProjectMemberships { get; set; } = new List<ProjectMember>();

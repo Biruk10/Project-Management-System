@@ -9,7 +9,6 @@ public class BudgetLine : BaseEntity
     public string? Description { get; set; }
     public decimal AllocatedAmount { get; set; }
 
-    // Navigation Properties
     public Budget Budget { get; set; } = null!;
     public ICollection<Expense> Expenses { get; set; } = new List<Expense>();
 }

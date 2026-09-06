@@ -7,9 +7,6 @@ using ShakaOrganizationPlatform.Infrastructure.Persistence.Seed;
 
 using System.Text.Json.Serialization;
 
-// Fix: Npgsql rejects DateTime with Kind=Unspecified for 'timestamp with time zone'.
-// EnableLegacyTimestampBehavior makes Npgsql treat Unspecified datetimes as local-time UTC,
-// so they are accepted and stored correctly.
 AppContext.SetSwitch("Npgsql.EnableLegacyTimestampBehavior", true);
 
 var builder = WebApplication.CreateBuilder(args);

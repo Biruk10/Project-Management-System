@@ -13,7 +13,6 @@ public class AuditLog : TenantEntity
     public string? IpAddress { get; set; }
     public DateTime OccurredAt { get; set; } = DateTime.UtcNow;
 
-    // Navigation Properties
     public Organization Organization { get; set; } = null!;
     public User? User { get; set; }
 }

@@ -14,7 +14,6 @@ public class Organization : BaseEntity
     public DateTime CreatedAt { get; set; } = DateTime.UtcNow;
     public DateTime? UpdatedAt { get; set; }
 
-    // Navigation Properties
     public ICollection<User> Users { get; set; } = new List<User>();
     public ICollection<Project> Projects { get; set; } = new List<Project>();
     public ICollection<Role> Roles { get; set; } = new List<Role>();

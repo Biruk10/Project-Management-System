@@ -38,6 +38,7 @@ public class AppDbContext : DbContext, IAppDbContext
     public DbSet<Expense> Expenses => Set<Expense>();
     public DbSet<Notification> Notifications => Set<Notification>();
     public DbSet<AuditLog> AuditLogs => Set<AuditLog>();
+    public DbSet<BudgetRequest> BudgetRequests => Set<BudgetRequest>();
 
     protected override void OnModelCreating(ModelBuilder modelBuilder)
     {
@@ -94,6 +95,14 @@ public class AppDbContext : DbContext, IAppDbContext
             .Property(e => e.Amount)
             .HasPrecision(18, 2);
 
+        modelBuilder.Entity<BudgetRequest>()
+            .Property(br => br.CurrentBudget)
+            .HasPrecision(18, 2);
+
+        modelBuilder.Entity<BudgetRequest>()
+            .Property(br => br.RequestedAmount)
+            .HasPrecision(18, 2);
+
         // Indexes
         modelBuilder.Entity<Permission>()
             .HasIndex(p => p.Key)
@@ -116,8 +125,7 @@ public class AppDbContext : DbContext, IAppDbContext
             .IsUnique();
 
         modelBuilder.Entity<ProjectMember>()
-            .HasIndex(pm => new { pm.ProjectId, pm.UserId })
-            .IsUnique();
+            .HasIndex(pm => new { pm.ProjectId, pm.Email });
 
         // User Relationships
         modelBuilder.Entity<User>()
@@ -189,12 +197,40 @@ public class AppDbContext : DbContext, IAppDbContext
             .HasOne(pm => pm.User)
             .WithMany(u => u.ProjectMemberships)
             .HasForeignKey(pm => pm.UserId)
-            .OnDelete(DeleteBehavior.Cascade);
+            .IsRequired(false)
+            .OnDelete(DeleteBehavior.SetNull);
 
         modelBuilder.Entity<ProjectMember>()
             .HasOne(pm => pm.Organization)
             .WithMany()
             .HasForeignKey(pm => pm.OrganizationId)
+            .OnDelete(DeleteBehavior.Cascade);
+
+        // BudgetRequest Relationships
+        modelBuilder.Entity<BudgetRequest>()
+            .HasOne(br => br.Project)
+            .WithMany()
+            .HasForeignKey(br => br.ProjectId)
+            .OnDelete(DeleteBehavior.Cascade);
+
+        modelBuilder.Entity<BudgetRequest>()
+            .HasOne(br => br.BudgetLine)
+            .WithMany()
+            .HasForeignKey(br => br.BudgetLineId)
+            .IsRequired(false)
+            .OnDelete(DeleteBehavior.SetNull);
+
+        modelBuilder.Entity<BudgetRequest>()
+            .HasOne(br => br.ReviewedByUser)
+            .WithMany()
+            .HasForeignKey(br => br.ReviewedBy)
+            .IsRequired(false)
+            .OnDelete(DeleteBehavior.SetNull);
+
+        modelBuilder.Entity<BudgetRequest>()
+            .HasOne(br => br.Organization)
+            .WithMany()
+            .HasForeignKey(br => br.OrganizationId)
             .OnDelete(DeleteBehavior.Cascade);
 
         // TaskItem Relationships

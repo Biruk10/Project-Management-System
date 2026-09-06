@@ -194,22 +194,56 @@ public class ProjectService : IProjectService
             .FirstOrDefaultAsync(p => p.Id == projectId, cancellationToken)
             ?? throw new KeyNotFoundException($"Project {projectId} not found.");
 
-        var userExists = await _context.Users.AnyAsync(u => u.Id == dto.UserId, cancellationToken);
-        if (!userExists)
-            throw new KeyNotFoundException($"User {dto.UserId} not found.");
+        int? matchedUserId = dto.UserId;
+        string firstName = dto.FirstName?.Trim() ?? string.Empty;
+        string lastName = dto.LastName?.Trim() ?? string.Empty;
+        string email = dto.Email?.Trim() ?? string.Empty;
+        string? phone = dto.Phone?.Trim();
 
-        var alreadyMember = await _context.ProjectMembers
-            .AnyAsync(pm => pm.ProjectId == projectId && pm.UserId == dto.UserId, cancellationToken);
+        // If UserId provided, populate names from User if available
+        if (dto.UserId.HasValue)
+        {
+            var user = await _context.Users.FirstOrDefaultAsync(u => u.Id == dto.UserId.Value, cancellationToken);
+            if (user != null)
+            {
+                if (string.IsNullOrEmpty(firstName)) firstName = user.FirstName;
+                if (string.IsNullOrEmpty(lastName)) lastName = user.LastName;
+                if (string.IsNullOrEmpty(email)) email = user.Email;
+            }
+        }
+        else if (!string.IsNullOrEmpty(email))
+        {
+            // Try to match existing organization user by email
+            var user = await _context.Users
+                .FirstOrDefaultAsync(u => u.Email.ToLower() == email.ToLower(), cancellationToken);
+            if (user != null)
+            {
+                matchedUserId = user.Id;
+                if (string.IsNullOrEmpty(firstName)) firstName = user.FirstName;
+                if (string.IsNullOrEmpty(lastName)) lastName = user.LastName;
+            }
+        }
+
+        // Check if already member (by UserId or Email)
+        var alreadyMember = await _context.ProjectMembers.AnyAsync(pm =>
+            pm.ProjectId == projectId && (
+                (matchedUserId.HasValue && pm.UserId == matchedUserId) ||
+                (!string.IsNullOrEmpty(email) && pm.Email.ToLower() == email.ToLower())
+            ), cancellationToken);
 
         if (alreadyMember)
-            throw new InvalidOperationException("User is already a member of this project.");
+            throw new InvalidOperationException("Person is already a member of this project.");
 
         _context.ProjectMembers.Add(new ProjectMember
         {
             OrganizationId = orgId,
             ProjectId = projectId,
-            UserId = dto.UserId,
-            ProjectRole = dto.ProjectRole,
+            UserId = matchedUserId,
+            FirstName = firstName,
+            LastName = lastName,
+            Email = email,
+            Phone = phone,
+            ProjectRole = string.IsNullOrWhiteSpace(dto.ProjectRole) ? "Member" : dto.ProjectRole.Trim(),
             JoinedAt = DateTime.UtcNow
         });
 
@@ -218,10 +252,11 @@ public class ProjectService : IProjectService
         return (await GetByIdAsync(projectId, cancellationToken))!;
     }
 
-    public async Task RemoveMemberAsync(int projectId, int userId, CancellationToken cancellationToken = default)
+    public async Task RemoveMemberAsync(int projectId, int memberId, CancellationToken cancellationToken = default)
     {
+        // Try match by ProjectMember.Id first, fallback to UserId
         var member = await _context.ProjectMembers
-            .FirstOrDefaultAsync(pm => pm.ProjectId == projectId && pm.UserId == userId, cancellationToken)
+            .FirstOrDefaultAsync(pm => pm.ProjectId == projectId && (pm.Id == memberId || pm.UserId == memberId), cancellationToken)
             ?? throw new KeyNotFoundException("Project member not found.");
 
         _context.ProjectMembers.Remove(member);
@@ -247,9 +282,15 @@ public class ProjectService : IProjectService
             CreatedAt = project.CreatedAt,
             Members = project.Members.Select(m => new ProjectMemberDto
             {
+                Id = m.Id,
                 UserId = m.UserId,
-                FullName = $"{m.User.FirstName} {m.User.LastName}",
-                Email = m.User.Email,
+                FirstName = !string.IsNullOrEmpty(m.FirstName) ? m.FirstName : (m.User != null ? m.User.FirstName : string.Empty),
+                LastName = !string.IsNullOrEmpty(m.LastName) ? m.LastName : (m.User != null ? m.User.LastName : string.Empty),
+                FullName = (!string.IsNullOrEmpty(m.FirstName) || !string.IsNullOrEmpty(m.LastName))
+                    ? $"{m.FirstName} {m.LastName}".Trim()
+                    : (m.User != null ? $"{m.User.FirstName} {m.User.LastName}" : string.Empty),
+                Email = !string.IsNullOrEmpty(m.Email) ? m.Email : (m.User != null ? m.User.Email : string.Empty),
+                Phone = m.Phone,
                 ProjectRole = m.ProjectRole,
                 JoinedAt = m.JoinedAt
             }).ToList()

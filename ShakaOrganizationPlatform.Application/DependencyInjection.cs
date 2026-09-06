@@ -25,6 +25,7 @@ public static class DependencyInjection
         services.AddScoped<IProjectService, ProjectService>();
         services.AddScoped<ITaskService, TaskService>();
         services.AddScoped<IBudgetService, BudgetService>();
+        services.AddScoped<IBudgetRequestService, BudgetRequestService>();
         services.AddScoped<IExpenseService, ExpenseService>();
         services.AddScoped<IDashboardService, DashboardService>();
         services.AddScoped<INotificationService, NotificationService>();

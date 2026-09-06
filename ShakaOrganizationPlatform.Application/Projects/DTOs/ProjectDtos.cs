@@ -20,9 +20,13 @@ public class ProjectDto
 
 public class ProjectMemberDto
 {
-    public int UserId { get; set; }
+    public int Id { get; set; }
+    public int? UserId { get; set; }
+    public string FirstName { get; set; } = string.Empty;
+    public string LastName { get; set; } = string.Empty;
     public string FullName { get; set; } = string.Empty;
     public string Email { get; set; } = string.Empty;
+    public string? Phone { get; set; }
     public string ProjectRole { get; set; } = string.Empty;
     public DateTime JoinedAt { get; set; }
 }
@@ -51,7 +55,11 @@ public class UpdateProjectDto
 
 public class AddProjectMemberDto
 {
-    public int UserId { get; set; }
+    public int? UserId { get; set; }
+    public string? FirstName { get; set; }
+    public string? LastName { get; set; }
+    public string? Email { get; set; }
+    public string? Phone { get; set; }
     public string ProjectRole { get; set; } = "Member";
 }
 

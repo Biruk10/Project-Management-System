@@ -66,11 +66,11 @@ public class ProjectsController : ControllerBase
         return Ok(result);
     }
 
-    [HttpDelete("{id:int}/members/{userId:int}")]
+    [HttpDelete("{id:int}/members/{memberId:int}")]
     [Authorize(Policy = "Project.Update")]
-    public async Task<IActionResult> RemoveMember(int id, int userId, CancellationToken cancellationToken)
+    public async Task<IActionResult> RemoveMember(int id, int memberId, CancellationToken cancellationToken)
     {
-        await _projectService.RemoveMemberAsync(id, userId, cancellationToken);
+        await _projectService.RemoveMemberAsync(id, memberId, cancellationToken);
         return NoContent();
     }
 }

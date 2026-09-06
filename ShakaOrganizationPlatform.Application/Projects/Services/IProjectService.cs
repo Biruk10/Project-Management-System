@@ -11,5 +11,5 @@ public interface IProjectService
     Task<ProjectDto> UpdateAsync(int id, UpdateProjectDto dto, CancellationToken cancellationToken = default);
     Task DeleteAsync(int id, CancellationToken cancellationToken = default);
     Task<ProjectDto> AddMemberAsync(int projectId, AddProjectMemberDto dto, CancellationToken cancellationToken = default);
-    Task RemoveMemberAsync(int projectId, int userId, CancellationToken cancellationToken = default);
+    Task RemoveMemberAsync(int projectId, int memberId, CancellationToken cancellationToken = default);
 }
